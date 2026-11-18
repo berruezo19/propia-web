@@ -16,7 +16,8 @@
   /* ---------- Parámetros de la calculadora PROPIA (hoja "Compra directa") ----------
      Cambia aquí cualquier valor si se actualiza el Excel. */
   const P = {
-    rentObjetivo: 0.32,          // rentabilidad anual exigida (fórmula E2: 0,32/365 × plazo)
+    margenOferta: 0.25,          // margen de la oferta (celda H3) → precio de compra neto (E3, el que lee Make)
+    margenMinimo: 0.20,          // margen mínimo (celda H2) → precio máximo para negociar (E2)
     plazoConReforma: 150,        // días (A3)
     plazoSinReforma: 105,
     umbralPrecio: 250000,        // € precio de venta (E4, E16, E17)
@@ -29,7 +30,7 @@
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
     notaria: 1500,               // (E18)
-    itp: { MD: 0.02, CT: 0.10, VC: 0.09 },  // Madrid 2 %, Cataluña 10 %, Valencia 9 % (actualizado; el Excel tenía CT 3 %, VC 8 %)
+    itp: { MD: 0.02, CT: 0.10, VC: 0.09 },  // H4: Madrid 2 %, Cataluña 10 %, Valencia 9 % (sobre el precio de compra)
     zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia" }
   };
 
@@ -42,9 +43,10 @@
   let current = { no: newNo(), fecha: new Date().toISOString() };
 
   /* ---------- Cálculo ---------- */
-  /* Réplica exacta de la hoja "Compra directa" de Calculadora_1.xlsx.
-     La hoja tiene una referencia circular (precio de compra ↔ gastos) que Excel resuelve
-     iterando; aquí se resuelve de forma exacta y, si oscila entre dos centenas, se toma la menor. */
+  /* Réplica de la hoja de Google "Compra directa" (versión con horquilla de margen 20–25 %).
+     Precio de compra P tal que margen = beneficio / coste total = m:
+       coste = P + honorarios compra(P) + honorarios venta + reforma + notaría + ITP·P = venta corregida / (1 + m)
+     Se despeja P de forma exacta (sin referencia circular) y se redondea a la centena inferior. */
   function calc() {
     const venta = num("venta"), sup = num("sup");
     const reforma = f.reforma.value === "SI", redis = f.redis.value === "SI";
@@ -53,7 +55,6 @@
     const plazo = reforma ? P.plazoConReforma : P.plazoSinReforma;                                   // A3
     const factor = venta < P.umbralPrecio ? plazo / 30 * P.factorBajo : plazo / 30 * P.factorAlto;    // E4
     const ventaCorr = venta * (1 - factor);                                                           // E5
-    const k = P.rentObjetivo / 365 * plazo;
 
     const honCompra = B3 => (B3 * P.honCompraPct > P.honCompraMin ? B3 * P.honCompraPct : P.honCompraMin) * P.iva;   // E15
     const honVenta = venta * P.honVentaPct * P.iva > P.honVentaMin ? 0 : P.honVentaMin - venta * P.honVentaPct * P.iva; // E16
@@ -62,31 +63,28 @@
                : (venta < P.umbralPrecio ? P.reformaSinRedisBajo : P.reformaSinRedisAlto))
       : P.sinReforma;
 
-    // E2 = E5 − k·(Gastos + B3) − Gastos, con Gastos = G0(B3) + ITP·E2  →  despeje lineal en E2
-    const bruto = B3 => { const G0 = honCompra(B3) + honVenta + costeReforma + P.notaria; return (ventaCorr - k * (G0 + B3) - G0) / (1 + itpR * (1 + k)); };
-    let B3 = Math.floor(ventaCorr / 100) * 100;
-    const vistos = [];
-    for (let i = 0; i < 100; i++) {
-      const nB3 = Math.floor(bruto(B3) / 100) * 100;                                                   // E3 = REDONDEAR.MENOS(E2;-2)
-      if (nB3 === B3) break;
-      if (vistos.includes(nB3)) { B3 = Math.min(nB3, B3); break; }
-      vistos.push(B3); B3 = nB3;
-    }
-    const precioBruto = bruto(B3);
-    const calculada = Math.max(0, B3);
+    const hc = P.honCompraPct * P.iva, hcMin = P.honCompraMin * P.iva;           // 0,0363 y 3.630 €
+    const precioPara = m => {                                                     // E2 / E3
+      const R = ventaCorr / (1 + m) - honVenta - costeReforma - P.notaria;
+      const conPct = R / (1 + hc + itpR);
+      const p = conPct > P.honCompraMin / P.honCompraPct ? conPct : (R - hcMin) / (1 + itpR);
+      return Math.max(0, Math.floor(p / 100) * 100);
+    };
+    const calculada = precioPara(P.margenOferta);                                 // oferta (margen 25 %)
+    const precioMax = precioPara(P.margenMinimo);                                 // límite (margen 20 %)
     const final = num("precioFinal") || calculada;
-    const baseItp = num("precioFinal") ? final : precioBruto;    // con precio manual, ITP sobre el precio real
 
-    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: P.notaria, itp: itpR * baseItp };
+    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: P.notaria, itp: itpR * final };
     g.total = g.honCompra + g.honVenta + g.reforma + g.notaria + g.itp;                                  // E20
     const coste = g.total + final;                                                                       // B11
     const beneficio = ventaCorr - coste;                                                                 // C11
     const margen = coste ? beneficio / coste : 0;                                                        // D11
     const solicitado = num("precio");
     return {
-      venta, plazo, factor, ventaCorr, precioBruto, calculada, final, g, coste, beneficio, zona, itpR,
+      venta, plazo, factor, ventaCorr, calculada, precioMax, final, g, coste, beneficio, zona, itpR,
       margen: margen * 100,
       rent: margen / plazo * 365 * 100,                                                                  // E11
+      sobreMax: final > precioMax,
       vsSolicitado: solicitado ? (final - solicitado) / solicitado * 100 : null,
       neto: final - num("cargas"),
       ok: venta > 0 && (!reforma || !redis || sup > 0)
@@ -106,8 +104,8 @@
         <tr><td>Precio de venta</td><td>${eur(c.venta)}</td></tr>
         <tr><td>Factor de corrección</td><td>${p1(c.factor * 100)}</td></tr>
         <tr><td>Precio de venta corregido</td><td>${eur(c.ventaCorr)}</td></tr>
-        <tr><td>Precio de compra bruto</td><td>${eur(c.precioBruto)}</td></tr>
-        <tr class="tot"><td>Precio de compra neto</td><td>${eur(c.calculada)}</td></tr>
+        <tr><td>Precio máximo (margen ${P.margenMinimo * 100} %)</td><td>${eur(c.precioMax)}</td></tr>
+        <tr class="tot"><td>Precio de compra neto (margen ${P.margenOferta * 100} %)</td><td>${eur(c.calculada)}</td></tr>
       </table></div>
       <div class="calc__group"><h5>Gastos${manual ? " <small>(sobre el precio final manual)</small>" : ""}</h5><table>
         <tr><td>Honorarios de compra</td><td>${eur(c.g.honCompra)}</td></tr>
@@ -127,12 +125,12 @@
     f.precioFinal.placeholder = c.calculada ? `Calculado: ${eur(c.calculada)}` : "Calculado automáticamente";
 
     // KPIs
-    const obj = P.rentObjetivo * 100;
-    const rCls = c.rent >= obj - 0.5 ? "good" : c.rent >= obj / 2 ? "mid" : "bad";
+    const lo = P.margenMinimo * 100, hi = P.margenOferta * 100;
+    const mCls = c.margen >= hi - 0.05 ? "good" : c.margen >= lo - 0.05 ? "mid" : "bad";
     $("#kpis").innerHTML = `
       <div class="kpi kpi--main"><span>Oferta</span><strong>${eur(c.final)}</strong></div>
-      <div class="kpi ${c.ok ? rCls : ""}"><span>Rentabilidad anual</span><strong>${c.ok ? p1(c.rent) : "—"}</strong><em>objetivo ${obj} %</em></div>
-      <div class="kpi"><span>Beneficio</span><strong>${c.ok ? eur(c.beneficio) : "—"}</strong><em>margen ${c.ok ? p1(c.margen) : "—"}</em></div>
+      <div class="kpi ${c.ok ? mCls : ""}"><span>Margen</span><strong>${c.ok ? p1(c.margen) : "—"}</strong><em>horquilla ${lo}–${hi} %</em></div>
+      <div class="kpi ${c.ok && c.sobreMax ? "bad" : ""}"><span>Precio máximo</span><strong>${c.ok ? eur(c.precioMax) : "—"}</strong><em>margen ${lo} %${c.ok && c.sobreMax ? " · ¡superado!" : ""}</em></div>
       <div class="kpi"><span>vs. solicitado</span><strong>${c.vsSolicitado === null ? "—" : pct(c.vsSolicitado)}</strong><em>${num("precio") ? eur(num("precio")) : ""}</em></div>`;
 
     // ---------- Documentos ----------
