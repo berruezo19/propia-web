@@ -157,7 +157,7 @@
 
     const conds = [
       `El precio se abonará conforme al calendario de pagos indicado. Las cantidades entregadas antes de la escritura tendrán la consideración de arras y se descontarán del precio.`,
-      `La escritura se otorgará ante el notario designado por ${esc(C.legalName)} en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma del contrato de arras.`,
+      `La escritura pública de compraventa se otorgará a favor de <strong>${esc(C.legalName)}</strong> (o de la persona física o jurídica que al efecto esta designe), ante el notario designado por ${esc(C.legalName)}, en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma del contrato de arras.`,
       on("c_comision") && "La operación no conlleva comisiones ni honorarios de intermediación para la parte vendedora.",
       on("c_gastos") && `${esc(C.legalName)} asume los gastos de notaría, registro de la propiedad y gestoría derivados de la compraventa.`,
       on("c_estado") && "El inmueble se adquiere en su estado actual de conservación, sin que la parte vendedora deba realizar reformas, reparaciones ni vaciar el inmueble, salvo pacto en contrario.",
@@ -203,7 +203,7 @@
       ${tablaPago}
       <ol start="2">
         <li>Que con la firma del presente documento recibe la cantidad de <strong>${eur(pago.senal)}</strong> en concepto de señal, que forma parte de las arras y se descontará del precio.</li>
-        <li>Que se compromete a firmar el contrato de arras por importe total del ${pago.pct} % del precio y a otorgar la escritura pública de compraventa en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma de dicho contrato.</li>
+        <li>Que se compromete a firmar el contrato de arras por importe total del ${pago.pct} % del precio y a otorgar la escritura pública de compraventa a favor de <strong>${esc(C.legalName)}</strong> (o de la persona física o jurídica que al efecto esta designe) en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma de dicho contrato.</li>
         <li>Que el inmueble se transmitirá ${on("c_cancel") ? "libre de cargas, o con las cargas existentes canceladas con cargo al precio en el acto de la escritura," : "libre de cargas y gravámenes,"} al corriente de pago de IBI, comunidad de propietarios y suministros, y libre de ocupantes en la fecha de entrega.</li>
         <li>Que facilitará la documentación necesaria para la operación: nota simple, último recibo del IBI, certificado de deudas de la comunidad, certificado de eficiencia energética y cédula de habitabilidad, en su caso.</li>
         <li>Que la aceptación queda sujeta a las mismas condiciones recogidas en la oferta de compra nº ${esc(current.no)}.</li>
