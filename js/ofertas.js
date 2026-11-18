@@ -419,29 +419,45 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
     const btn = $("#btnKnack"); btn.disabled = true; kMsg("Buscando en Knack…");
     try {
       const r = await fetch(C.makeWebhookKnack, { method: "POST", body: new URLSearchParams({ numero, clave }) });
-      const txt = await r.text();
-      let d; try { d = JSON.parse(txt); } catch { d = null; }
-      if (Array.isArray(d)) d = d[0];
-      if (!d || !d.id) { kMsg(`No se ha encontrado la oferta nº ${numero} o la clave no es correcta.`, true); return; }
+      const txt = (await r.text()).trim();
+      let k = null;   // oferta normalizada
+      if (/^ok=1(&|$)/.test(txt)) {                       // respuesta actual de Make (campo=valor&…)
+        const q = new URLSearchParams(txt), g = n => strip(q.get(n));
+        if (g("id")) k = {
+          id: g("id"), numero: g("numero"),
+          direccion: [g("calle"), g("calle2")].filter(Boolean).join(" ") || g("direccion_txt"),
+          poblacion: g("ciudad"), cp: g("cp"), catastro: g("catastro"), zona: g("zona"),
+          venta: toNum(q.get("venta")) || toNum(q.get("venta_txt")), reforma: yes(g("reforma")), redis: yes(g("redis")),
+          sup: toNum(q.get("sup")), agencia: g("agencia"), franquiciado: g("franquiciado"), asesor: g("asesor"),
+          estado: g("estado"), precioCompra: toNum(q.get("precio_compra"))
+        };
+      } else {                                              // compatibilidad: registro de Knack en JSON
+        let d; try { d = JSON.parse(txt); } catch { d = null; }
+        if (Array.isArray(d)) d = d[0];
+        if (d && d.id) { const a = d.field_246_raw || {}; k = {
+          id: d.id, numero: strip(d.field_317_raw ?? d.field_317),
+          direccion: strip([a.street, a.street2].filter(Boolean).join(" ")) || strip(d.field_246),
+          poblacion: strip(a.city), cp: strip(a.zip), catastro: strip(d.field_314_raw ?? d.field_314), zona: strip(d.field_269_raw ?? d.field_269),
+          venta: toNum(d.field_234_raw ?? d.field_234), reforma: yes(d.field_235_raw ?? d.field_235), redis: yes(d.field_247_raw ?? d.field_247),
+          sup: toNum(d.field_236_raw ?? d.field_236), agencia: ident(d.field_346_raw), franquiciado: ident(d.field_316_raw), asesor: ident(d.field_347_raw),
+          estado: strip(d.field_320), precioCompra: toNum(d.field_325_raw ?? d.field_325)
+        }; }
+      }
+      if (!k) { kMsg(`No se ha encontrado la oferta nº ${numero} o la clave no es correcta.`, true); return; }
       setKey(clave); showKey();
 
-      const a = d.field_246_raw || {};
       reset();
+      const zona = (k.zona || "").toUpperCase();
       fill({
-        direccion: strip([a.street, a.street2].filter(Boolean).join(" ")) || strip(d.field_246),
-        poblacion: strip(a.city), cp: strip(a.zip), catastro: strip(d.field_314_raw ?? d.field_314),
-        agencia: ident(d.field_346_raw), franquiciado: ident(d.field_316_raw), asesor: ident(d.field_347_raw),
-        estadoKnack: strip(d.field_320),
-        venta: toNum(d.field_234_raw ?? d.field_234) || "",
-        reforma: yes(d.field_235_raw ?? d.field_235) ? "SI" : "NO",
-        redis: yes(d.field_247_raw ?? d.field_247) ? "SI" : "NO",
-        sup: toNum(d.field_236_raw ?? d.field_236) || "", m2c: toNum(d.field_236_raw ?? d.field_236) || "",
-        zonaItp: ["VC", "CT", "MD"].includes(strip(d.field_269_raw ?? d.field_269).toUpperCase()) ? strip(d.field_269_raw ?? d.field_269).toUpperCase() : "VC"
+        direccion: k.direccion, poblacion: k.poblacion, cp: k.cp, catastro: k.catastro,
+        agencia: k.agencia, franquiciado: k.franquiciado, asesor: k.asesor, estadoKnack: k.estado,
+        venta: k.venta || "", reforma: k.reforma ? "SI" : "NO", redis: k.redis ? "SI" : "NO",
+        sup: k.sup || "", m2c: k.sup || "", zonaItp: ["VC", "CT", "MD"].includes(zona) ? zona : "VC"
       });
       f.sup.dataset.touched = "1";
-      current = { no: String(strip(d.field_317_raw ?? d.field_317) || numero), fecha: new Date().toISOString(), knackId: d.id };
+      current = { no: String(k.numero || numero), fecha: new Date().toISOString(), knackId: k.id };
       update();
-      const prev = toNum(d.field_325_raw ?? d.field_325);
+      const prev = k.precioCompra;
       kMsg(`✓ Oferta nº ${current.no} cargada de Knack${prev ? ` · precio de compra guardado en Knack: ${eur(prev)}` : ""}.`);
     } catch {
       kMsg("No se pudo conectar con Make. Revisa la conexión e inténtalo de nuevo.", true);
