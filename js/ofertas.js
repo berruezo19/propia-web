@@ -135,59 +135,97 @@
       <div class="kpi"><span>Beneficio</span><strong>${c.ok ? eur(c.beneficio) : "—"}</strong><em>margen ${c.ok ? p1(c.margen) : "—"}</em></div>
       <div class="kpi"><span>vs. solicitado</span><strong>${c.vsSolicitado === null ? "—" : pct(c.vsSolicitado)}</strong><em>${num("precio") ? eur(num("precio")) : ""}</em></div>`;
 
-    // Documento
+    // ---------- Documentos ----------
     const hoy = new Date(current.fecha);
     const validoHasta = new Date(hoy); validoHasta.setDate(hoy.getDate() + (num("validez") || 7));
     const ph = t => `<em class="ph">${t}</em>`;
+    const lugar = esc(v.poblacion) || "Barcelona";
+    const pago = payments(c.final);
+    const dir = `${esc(v.direccion) || ph("Dirección del inmueble")}${v.poblacion ? `, ${esc(v.poblacion)}` : ""}${v.cp ? ` (${esc(v.cp)})` : ""}`;
+    const head = titulo => `
+      <header class="doc__head">
+        <div class="logo"><img src="img/logo.svg" alt="" width="30" height="30"><span>Propia</span></div>
+        <div class="doc__meta"><strong>${titulo}</strong><span>Nº ${esc(current.no)}</span><span>${lugar}, ${fecha(hoy)}</span></div>
+      </header>`;
+    const tablaPago = `
+      <table class="doc__net doc__pay">
+        <tr><td>Señal, a la firma de la aceptación de esta oferta</td><td>${eur(pago.senal)}</td></tr>
+        <tr><td>Resto de arras hasta el ${pago.pct} % del precio, a la firma del contrato de arras</td><td>${eur(pago.restoArras)}</td></tr>
+        <tr><td>Resto del precio (${100 - pago.pct} %), en el otorgamiento de la escritura pública</td><td>${eur(pago.restante)}</td></tr>
+        <tr class="tot"><td>Precio total</td><td>${eur(c.final)}</td></tr>
+      </table>`;
+    const interv = [v.agencia && `Agencia: <strong>${esc(v.agencia)}</strong>`, v.franquiciado && `Franquiciado: <strong>${esc(v.franquiciado)}</strong>`].filter(Boolean).join(" · ");
+    const foot = `<footer class="doc__foot">${esc(C.legalName)}${C.cif ? " · CIF " + esc(C.cif) : ""} · ${esc(C.address)} · ${esc(C.email)}${C.phone ? " · " + esc(C.phone) : ""}</footer>`;
+
     const conds = [
-      `El pago se realizará <strong>al contado</strong>, mediante transferencia bancaria o cheque bancario, en el momento del otorgamiento de la escritura pública de compraventa.`,
-      `La escritura se otorgará ante el notario designado por PROPIA en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la aceptación de la presente oferta.`,
-      num("senal") ? `A la aceptación, PROPIA entregará una señal de <strong>${eur(num("senal"))}</strong> a cuenta del precio, que se descontará del importe a pagar en la firma.` : "",
+      `El precio se abonará conforme al calendario de pagos indicado. Las cantidades entregadas antes de la escritura tendrán la consideración de arras y se descontarán del precio.`,
+      `La escritura se otorgará ante el notario designado por ${esc(C.legalName)} en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma del contrato de arras.`,
       on("c_comision") && "La operación no conlleva comisiones ni honorarios de intermediación para la parte vendedora.",
-      on("c_gastos") && "PROPIA asume los gastos de notaría, registro de la propiedad y gestoría derivados de la compraventa.",
-      on("c_estado") && "PROPIA adquiere el inmueble en su estado actual de conservación, sin que la parte vendedora deba realizar reformas, reparaciones ni vaciar el inmueble, salvo pacto en contrario.",
-      on("c_cancel") && "Las hipotecas, embargos u otras cargas existentes se cancelarán con cargo al precio en el mismo acto de la firma, encargándose PROPIA de su gestión.",
+      on("c_gastos") && `${esc(C.legalName)} asume los gastos de notaría, registro de la propiedad y gestoría derivados de la compraventa.`,
+      on("c_estado") && "El inmueble se adquiere en su estado actual de conservación, sin que la parte vendedora deba realizar reformas, reparaciones ni vaciar el inmueble, salvo pacto en contrario.",
+      on("c_cancel") && "Las hipotecas, embargos u otras cargas existentes se cancelarán con cargo al precio en el mismo acto de la firma de la escritura.",
       on("c_plusvalia") && "El Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana (plusvalía municipal) será a cargo de la parte vendedora, conforme a la legislación vigente.",
       `Entrega de llaves y posesión: <strong>${esc(v.llaves).toLowerCase()}</strong>, con el inmueble libre de ocupantes${v.ocupacion === "Alquilado" ? ", salvo los arrendatarios con contrato en vigor que se detallen" : ""}.`,
       "La oferta está sujeta a la verificación de la información registral (nota simple) y a que la situación legal y física del inmueble coincida con la analizada en el estudio técnico y legal.",
       v.obs && esc(v.obs)
     ].filter(Boolean);
 
-    $("#doc").innerHTML = `
-      <header class="doc__head">
-        <div class="logo"><img src="img/logo.svg" alt="" width="30" height="30"><span>Propia</span></div>
-        <div class="doc__meta"><strong>Oferta de compra directa</strong><span>Nº ${current.no}</span><span>Barcelona, ${fecha(hoy)}</span></div>
-      </header>
-
-      <p class="doc__to">A la atención de <strong>${esc(v.nombre) || ph("Nombre del propietario")}</strong>${v.dni ? `, con DNI/NIE ${esc(v.dni)}` : ""}:</p>
-      <p>Tras la visita técnica y el estudio legal y de viabilidad realizados, <strong>${esc(C.legalName)}</strong>${C.cif ? ` (CIF ${esc(C.cif)})` : ""} le presenta la siguiente oferta firme de compra directa del inmueble de su propiedad:</p>
-
+    // 1) OFERTA DE COMPRA
+    $("#doc").innerHTML = `${head("Oferta de compra")}
+      <p class="doc__to">A la atención de <strong>${esc(v.nombre) || "la propiedad del inmueble"}</strong>${v.dni ? `, con DNI/NIE ${esc(v.dni)}` : ""}:</p>
+      <p><strong>${esc(C.legalName)}</strong>${C.cif ? ` (CIF ${esc(C.cif)})` : ""} presenta la siguiente oferta de compra del inmueble que se describe a continuación:</p>
       <div class="doc__prop">
-        <div><span>Inmueble</span><strong>${esc(v.direccion) || ph("Dirección del inmueble")}${v.cp ? `, ${esc(v.cp)}` : ""}</strong></div>
-        <div class="doc__specs">${[v.tipo, num("m2c") && `${num("m2c")} m² construidos`, num("m2u") && `${num("m2u")} m² útiles`, v.habban && `${esc(v.habban)} hab./baños`, v.planta && `Planta ${esc(v.planta)}`, v.anio && `Año ${esc(v.anio)}`].filter(Boolean).join(" · ")}</div>
+        <div><span>Inmueble</span><strong>${dir}</strong></div>
+        <div class="doc__specs">${[v.catastro && `Ref. catastral ${esc(v.catastro)}`, (num("sup") || num("m2c")) && `${num("sup") || num("m2c")} m²`, v.tipo, v.planta && `Planta ${esc(v.planta)}`].filter(Boolean).join(" · ")}</div>
       </div>
-
-      <div class="doc__price">
-        <span>Precio ofertado</span>
-        <strong>${eur(c.final)}</strong>
-        <em>Pago íntegro al contado en notaría</em>
-      </div>
+      <div class="doc__price"><span>Precio ofertado</span><strong>${eur(c.final)}</strong><em>Pago al contado</em></div>
+      ${tablaPago}
       ${on("c_neto") && num("cargas") ? `<table class="doc__net">
-        <tr><td>Precio de compraventa</td><td>${eur(c.final)}</td></tr>
         <tr><td>Cancelación de hipoteca / cargas (estimado)</td><td>− ${eur(num("cargas"))}</td></tr>
-        <tr class="tot"><td>Importe neto estimado a recibir</td><td>${eur(c.neto)}</td></tr></table>` : ""}
-
+        <tr class="tot"><td>Importe neto estimado a recibir por la propiedad</td><td>${eur(c.neto)}</td></tr></table>` : ""}
       <h4>Condiciones</h4>
       <ol>${conds.map(x => `<li>${x}</li>`).join("")}</ol>
-
       <h4>Validez</h4>
-      <p>La presente oferta es válida hasta el <strong>${fecha(validoHasta)}</strong>. Para aceptarla basta con firmar este documento y remitirlo a ${esc(C.email)}. Transcurrido dicho plazo sin aceptación, quedará sin efecto.</p>
-
-      <div class="doc__signs">
-        <div><span></span><strong>Por PROPIA</strong>${esc(v.firmante) || ""}</div>
-        <div><span></span><strong>Aceptación del propietario</strong>${esc(v.nombre) || ""}<br>Fecha: ____ / ____ / ________</div>
+      <p>La presente oferta es válida hasta el <strong>${fecha(validoHasta)}</strong>. Transcurrido dicho plazo sin aceptación por escrito, quedará sin efecto.</p>
+      ${interv ? `<p class="doc__interv">Operación presentada por: ${interv}</p>` : ""}
+      <div class="doc__signs doc__signs--one">
+        <div><span></span><strong>Por ${esc(C.legalName)}</strong>${esc(v.firmante) || ""}</div>
       </div>
-      <footer class="doc__foot">${esc(C.legalName)}${C.cif ? " · CIF " + esc(C.cif) : ""} · ${esc(C.address)} · ${esc(C.email)}${C.phone ? " · " + esc(C.phone) : ""}</footer>`;
+      ${foot}`;
+
+    // 2) ACEPTACIÓN DE LA OFERTA (generada con los datos de Knack)
+    $("#doc2").innerHTML = `${head("Aceptación de la oferta de compra")}
+      <p>En ${lugar}, a ${fecha(hoy)}.</p>
+      <p>D./Dña. <strong>${esc(v.nombre) || "_______________________________________"}</strong>, con DNI/NIE <strong>${esc(v.dni) || "________________"}</strong>,
+        en su condición de propietario/a${v.nombre ? "" : " (o en representación de la propiedad)"} del inmueble sito en <strong>${dir}</strong>${v.catastro ? `, con referencia catastral <strong>${esc(v.catastro)}</strong>` : ""},</p>
+      <h4>Manifiesta</h4>
+      <ol>
+        <li>Que <strong>ACEPTA</strong> la oferta de compra nº <strong>${esc(current.no)}</strong> formulada por <strong>${esc(C.legalName)}</strong>${C.cif ? ` (CIF ${esc(C.cif)})` : ""} por un precio total de <strong>${eur(c.final)}</strong>, que se abonará del siguiente modo:</li>
+      </ol>
+      ${tablaPago}
+      <ol start="2">
+        <li>Que con la firma del presente documento recibe la cantidad de <strong>${eur(pago.senal)}</strong> en concepto de señal, que forma parte de las arras y se descontará del precio.</li>
+        <li>Que se compromete a firmar el contrato de arras por importe total del ${pago.pct} % del precio y a otorgar la escritura pública de compraventa en un plazo máximo de <strong>${num("plazo") || 15} días naturales</strong> desde la firma de dicho contrato.</li>
+        <li>Que el inmueble se transmitirá ${on("c_cancel") ? "libre de cargas, o con las cargas existentes canceladas con cargo al precio en el acto de la escritura," : "libre de cargas y gravámenes,"} al corriente de pago de IBI, comunidad de propietarios y suministros, y libre de ocupantes en la fecha de entrega.</li>
+        <li>Que facilitará la documentación necesaria para la operación: nota simple, último recibo del IBI, certificado de deudas de la comunidad, certificado de eficiencia energética y cédula de habitabilidad, en su caso.</li>
+        <li>Que la aceptación queda sujeta a las mismas condiciones recogidas en la oferta de compra nº ${esc(current.no)}.</li>
+      </ol>
+      ${interv ? `<p class="doc__interv">Operación presentada por: ${interv}</p>` : ""}
+      <div class="doc__signs">
+        <div><span></span><strong>La propiedad</strong>${esc(v.nombre) || "Nombre y DNI"}</div>
+        <div><span></span><strong>Por ${esc(C.legalName)}</strong>${esc(v.firmante) || ""}</div>
+      </div>
+      <p class="doc__rgpd">Los datos personales se tratarán por ${esc(C.legalName)} con la finalidad de gestionar la presente operación de compraventa, conforme al RGPD. Puede ejercer sus derechos escribiendo a ${esc(C.email)}.</p>
+      ${foot}`;
+  }
+
+  // Calendario de pagos: señal + resto de arras hasta el X % + resto en escritura
+  // (como la plantilla de Make: ARRAS = precio × 10 % − 5.000 €; RESTANTE = precio × 90 %)
+  function payments(precio) {
+    const pct = num("arrasPct") || 10;
+    const arras = precio * pct / 100;
+    const senal = Math.min(num("senal"), arras);
+    return { pct, senal, restoArras: arras - senal, restante: precio - arras };
   }
 
   f.addEventListener("input", update);
@@ -209,24 +247,34 @@
   /* ---------- Acciones ---------- */
   $("#btnPrint").addEventListener("click", () => {
     if (!valid()) return;
+    const what = $("#printWhat").value;
+    document.body.dataset.print = what;
     const t = document.title;
-    document.title = `Oferta PROPIA ${current.no} - ${f.nombre.value}`;
+    const nombre = { both: "Oferta y aceptación", oferta: "Oferta", aceptacion: "Aceptación" }[what];
+    document.title = `${current.no} - ${nombre} - ${f.direccion.value}`;
     window.print();
     document.title = t;
   });
 
+  // Pestañas de vista previa
+  document.querySelectorAll(".doc-tabs button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".doc-tabs button").forEach(x => x.classList.toggle("is-on", x === b));
+    $("#doc").hidden = b.dataset.tab !== "doc"; $("#doc2").hidden = b.dataset.tab !== "doc2";
+  }));
+
   $("#btnMail").addEventListener("click", () => {
     if (!valid()) return;
     const c = calc();
-    const body = `Estimado/a ${f.nombre.value}:
+    const body = `${f.nombre.value ? `Estimado/a ${f.nombre.value}` : "Buenos días"}:
 
-Tras la visita técnica y el estudio de su inmueble en ${f.direccion.value}, le hacemos llegar nuestra oferta de compra directa (Nº ${current.no}):
+Le hacemos llegar la oferta de compra Nº ${current.no} para el inmueble en ${f.direccion.value}:
 
-· Precio ofertado: ${eur(c.final)}, al contado en notaría
+· Precio ofertado: ${eur(c.final)}, al contado
+· Señal: ${eur(payments(c.final).senal)} · Arras: ${payments(c.final).pct} % · Resto en escritura: ${eur(payments(c.final).restante)}
 · Firma ante notario en un máximo de ${num("plazo")} días desde la aceptación
 · Sin comisiones${f.c_gastos.checked ? " y sin gastos de notaría ni registro para usted" : ""}
 
-Le adjuntamos el documento completo con todas las condiciones. La oferta es válida durante ${num("validez")} días.
+Adjuntamos la oferta y el documento de aceptación con todas las condiciones. La oferta es válida durante ${num("validez")} días.
 
 Quedamos a su disposición para cualquier duda.
 
@@ -272,7 +320,9 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
     window.sendToMake(C.makeWebhookOfertas, {
       numero: current.no, fecha: new Date().toISOString().slice(0, 10),
       propietario: f.nombre.value, dni: f.dni.value, telefono: f.telefono.value, email: f.email.value,
-      direccion: f.direccion.value, cp: f.cp.value, m2: f.m2c.value,
+      direccion: f.direccion.value, poblacion: f.poblacion.value, cp: f.cp.value, catastro: f.catastro.value, m2: f.sup.value || f.m2c.value,
+      agencia: f.agencia.value, franquiciado: f.franquiciado.value, asesor: f.asesor.value,
+      senal: payments(c.final).senal, resto_arras: payments(c.final).restoArras, restante: payments(c.final).restante,
       precio_solicitado: num("precio"), precio_venta_estimado: c.venta,
       oferta: c.final, oferta_calculada: c.calculada, precio_manual: num("precioFinal") ? "Sí" : "No",
       gastos_total: Math.round(c.g.total), coste_total: Math.round(c.coste), beneficio: Math.round(c.beneficio),
@@ -341,6 +391,65 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
       history.replaceState(null, "", location.pathname);
     } catch { msg("No se pudo leer la solicitud del enlace."); }
   }
+
+  /* ---------- Cargar oferta desde Knack (vía Make) ---------- */
+  const KEY_STORE = "propia_knack_key";
+  const getKey = () => { try { return localStorage.getItem(KEY_STORE) || ""; } catch { return ""; } };
+  const setKey = k => { try { k ? localStorage.setItem(KEY_STORE, k) : localStorage.removeItem(KEY_STORE); } catch {} };
+  const kMsg = (t, err) => { const m = $("#knackMsg"); m.textContent = t; m.classList.toggle("is-err", !!err); };
+  const showKey = () => { $("#knackKeyWrap").hidden = !!getKey(); };
+  showKey();
+  if (!C.makeWebhookKnack) { $("#btnKnack").disabled = true; kMsg("Falta configurar makeWebhookKnack en js/config.js."); }
+
+  const strip = h => String(h ?? "").replace(/<br\s*\/?>/gi, " ").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").trim();
+  const ident = raw => (Array.isArray(raw) ? raw : raw ? [raw] : []).map(x => strip(x.identifier ?? x)).filter(Boolean).join(", ");
+  const toNum = x => {
+    if (typeof x === "number") return x;
+    const t = strip(x).replace(/[^\d,.-]/g, "");
+    if (!t) return 0;
+    return parseFloat(/,\d{1,2}$/.test(t) ? t.replace(/\./g, "").replace(",", ".") : t.replace(/[.,]/g, "")) || 0;
+  };
+  const yes = x => x === true || /^(s[ií]|yes|true)$/i.test(strip(Array.isArray(x) ? x[0] : x));
+
+  async function loadKnack() {
+    const numero = $("#knackNum").value.trim();
+    const clave = getKey() || $("#knackKey").value.trim();
+    if (!numero) return kMsg("Escribe el nº de oferta.", true);
+    if (!clave) return kMsg("Escribe la clave de acceso.", true);
+    const btn = $("#btnKnack"); btn.disabled = true; kMsg("Buscando en Knack…");
+    try {
+      const r = await fetch(C.makeWebhookKnack, { method: "POST", body: new URLSearchParams({ numero, clave }) });
+      const txt = await r.text();
+      let d; try { d = JSON.parse(txt); } catch { d = null; }
+      if (Array.isArray(d)) d = d[0];
+      if (!d || !d.id) { kMsg(`No se ha encontrado la oferta nº ${numero} o la clave no es correcta.`, true); return; }
+      setKey(clave); showKey();
+
+      const a = d.field_246_raw || {};
+      reset();
+      fill({
+        direccion: strip([a.street, a.street2].filter(Boolean).join(" ")) || strip(d.field_246),
+        poblacion: strip(a.city), cp: strip(a.zip), catastro: strip(d.field_314_raw ?? d.field_314),
+        agencia: ident(d.field_346_raw), franquiciado: ident(d.field_316_raw), asesor: ident(d.field_347_raw),
+        estadoKnack: strip(d.field_320),
+        venta: toNum(d.field_234_raw ?? d.field_234) || "",
+        reforma: yes(d.field_235_raw ?? d.field_235) ? "SI" : "NO",
+        redis: yes(d.field_247_raw ?? d.field_247) ? "SI" : "NO",
+        sup: toNum(d.field_236_raw ?? d.field_236) || "", m2c: toNum(d.field_236_raw ?? d.field_236) || "",
+        zonaItp: ["VC", "CT", "MD"].includes(strip(d.field_269_raw ?? d.field_269).toUpperCase()) ? strip(d.field_269_raw ?? d.field_269).toUpperCase() : "VC"
+      });
+      f.sup.dataset.touched = "1";
+      current = { no: String(strip(d.field_317_raw ?? d.field_317) || numero), fecha: new Date().toISOString(), knackId: d.id };
+      update();
+      const prev = toNum(d.field_325_raw ?? d.field_325);
+      kMsg(`✓ Oferta nº ${current.no} cargada de Knack${prev ? ` · precio de compra guardado en Knack: ${eur(prev)}` : ""}.`);
+    } catch {
+      kMsg("No se pudo conectar con Make. Revisa la conexión e inténtalo de nuevo.", true);
+    } finally { btn.disabled = !C.makeWebhookKnack; }
+  }
+  $("#btnKnack").addEventListener("click", loadKnack);
+  $("#knackNum").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); loadKnack(); } });
+  $("#knackMsg").addEventListener("dblclick", () => { setKey(""); showKey(); kMsg("Clave olvidada en este navegador."); });
 
   importFromHash();
   refreshCount();

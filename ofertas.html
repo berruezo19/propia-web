@@ -27,26 +27,47 @@
 <main class="container container--wide tool__grid">
   <!-- ======= FORMULARIO ======= -->
   <form id="of" class="tool__form" autocomplete="off" novalidate>
+    <fieldset class="panel panel--knack">
+      <legend>Cargar oferta desde Knack</legend>
+      <div class="knack">
+        <label>Nº de oferta (ID en Knack)<input id="knackNum" type="number" min="1" placeholder="319"></label>
+        <label id="knackKeyWrap">Clave de acceso<input id="knackKey" type="password" autocomplete="off" placeholder="Solo la primera vez"></label>
+        <button class="btn btn--grad" type="button" id="btnKnack">Cargar</button>
+      </div>
+      <p class="knack__msg" id="knackMsg" role="status"></p>
+    </fieldset>
+
     <p class="import" id="importMsg" hidden></p>
 
     <fieldset class="panel">
-      <legend>1. Propietario</legend>
+      <legend>1. Intervinientes</legend>
       <div class="grid2">
-        <label>Nombre completo <b>*</b><input name="nombre" required></label>
-        <label>DNI / NIE <b>*</b><input name="dni" required></label>
-        <label>Teléfono<input name="telefono" type="tel"></label>
-        <label>Email<input name="email" type="email"></label>
+        <label>Agencia<input name="agencia"></label>
+        <label>Franquiciado<input name="franquiciado"></label>
+        <label>Asesor de área<input name="asesor"></label>
+        <label>Estado en Knack<input name="estadoKnack" readonly placeholder="—"></label>
       </div>
+      <details class="owner">
+        <summary>Datos del propietario <small>(opcional, si se conocen)</small></summary>
+        <div class="grid2">
+          <label>Nombre completo<input name="nombre"></label>
+          <label>DNI / NIE<input name="dni"></label>
+          <label>Teléfono<input name="telefono" type="tel"></label>
+          <label>Email<input name="email" type="email"></label>
+        </div>
+      </details>
     </fieldset>
 
     <fieldset class="panel">
       <legend>2. Inmueble</legend>
-      <label>Dirección completa / Ref. catastral <b>*</b><input name="direccion" required></label>
+      <label>Dirección <b>*</b><input name="direccion" required></label>
       <div class="grid3">
-        <label>CP / Ciudad<input name="cp"></label>
+        <label>Población<input name="poblacion"></label>
+        <label>Código postal<input name="cp"></label>
+        <label>Ref. catastral<input name="catastro"></label>
         <label>Tipo<input name="tipo" list="tipos"></label>
         <label>Año<input name="anio" type="number"></label>
-        <label>m² construidos <b>*</b><input name="m2c" type="number" min="10" required></label>
+        <label>m² construidos<input name="m2c" type="number" min="10"></label>
         <label>m² útiles<input name="m2u" type="number"></label>
         <label>Hab. / Baños<input name="habban" placeholder="3 / 2"></label>
         <label>Planta<input name="planta" placeholder="3º"></label>
@@ -86,7 +107,8 @@
       <div class="grid2">
         <label>Validez de la oferta (días)<input name="validez" type="number" min="1" value="7"></label>
         <label>Firma ante notario como máximo en (días desde aceptación)<input name="plazo" type="number" min="1" value="15"></label>
-        <label>Señal a la aceptación (€) <small>0 = sin señal</small><input name="senal" type="number" step="500" value="0"></label>
+        <label>Señal a la aceptación (€)<input name="senal" type="number" step="500" value="5000"></label>
+        <label>Arras (% del precio, incluye la señal)<input name="arrasPct" type="number" step="1" min="0" max="100" value="10"></label>
         <label>Entrega de llaves
           <select name="llaves"><option>En el acto de la firma</option><option>15 días tras la firma</option><option>30 días tras la firma</option></select></label>
       </div>
@@ -103,7 +125,12 @@
     </fieldset>
 
     <div class="tool__actions">
-      <button class="btn btn--grad" type="button" id="btnPrint">Descargar PDF / Imprimir</button>
+      <button class="btn btn--grad" type="button" id="btnPrint">Descargar PDF</button>
+      <select id="printWhat" class="print-what" aria-label="Qué documento descargar">
+        <option value="both">Oferta + Aceptación</option>
+        <option value="oferta">Solo oferta</option>
+        <option value="aceptacion">Solo aceptación</option>
+      </select>
       <button class="btn btn--line" type="button" id="btnMail">Enviar al propietario</button>
       <button class="btn btn--line" type="button" id="btnSave">Guardar oferta</button>
     </div>
@@ -113,7 +140,12 @@
   <!-- ======= VISTA PREVIA ======= -->
   <aside class="tool__preview">
     <div class="kpis" id="kpis"></div>
+    <div class="doc-tabs" role="tablist">
+      <button type="button" class="is-on" data-tab="doc">Oferta de compra</button>
+      <button type="button" data-tab="doc2">Aceptación de la oferta</button>
+    </div>
     <article class="doc" id="doc"></article>
+    <article class="doc" id="doc2" hidden></article>
   </aside>
 </main>
 

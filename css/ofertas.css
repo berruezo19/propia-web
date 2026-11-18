@@ -73,6 +73,27 @@
 .doc__foot{margin-top:2.5rem;padding-top:.8rem;border-top:1px solid var(--line);text-align:center;font-size:.7rem;color:var(--muted)}
 .doc .ph{color:#c4bccd}
 
+/* Knack */
+.panel--knack{border-color:#d9c7f3;background:linear-gradient(180deg,#fbf7ff,#fff)}
+.knack{display:grid;grid-template-columns:1fr 1fr auto;gap:.8rem;align-items:end}
+.knack [hidden]{display:none}
+.knack__msg{font-size:.85rem;color:var(--ok);min-height:1.2em}
+.knack__msg.is-err{color:var(--err)}
+.owner summary{cursor:pointer;font-size:.85rem;font-weight:600;color:var(--ink);padding:.3rem 0}
+.owner summary small{font-weight:400;color:var(--muted)}
+.owner .grid2{margin-top:.8rem}
+.print-what{width:auto;padding:.55em .7em;font-size:.85rem}
+input[readonly]{background:var(--soft);color:var(--muted)}
+
+/* Pestañas de documentos */
+.doc-tabs{display:flex;gap:.4rem}
+.doc-tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:.45em 1em;font:600 .85rem var(--font);color:var(--muted);cursor:pointer}
+.doc-tabs button.is-on{background:var(--ink);border-color:var(--ink);color:#fff}
+.doc__pay{margin-top:0}
+.doc__interv{font-size:.78rem;color:var(--muted);margin-top:1.2rem}
+.doc__rgpd{font-size:.68rem;color:var(--muted);margin-top:1.6rem}
+.doc__signs--one{grid-template-columns:1fr;max-width:50%}
+
 /* Historial */
 .hist{border:0;border-radius:var(--r);padding:0;width:min(680px,calc(100% - 32px));box-shadow:var(--shadow-lg)}
 .hist::backdrop{background:rgba(20,10,30,.45)}
@@ -98,6 +119,8 @@
   .tag{display:none}
   .grid3{grid-template-columns:1fr 1fr}
   .kpis{grid-template-columns:1fr 1fr}
+  .knack{grid-template-columns:1fr}
+  .doc__signs--one{max-width:none}
   .doc{padding:1.6rem 1.2rem}
   .doc__signs{grid-template-columns:1fr;gap:1.5rem}
   .tool__actions .btn{flex:1 1 100%}
@@ -107,12 +130,31 @@
 
 /* Impresión: solo el documento */
 @media print{
-  @page{size:A4;margin:14mm}
+  @page{size:A4;margin:11mm 13mm}
+  .doc{font-size:9.2pt!important;line-height:1.45}
+  .doc__head{padding-bottom:.7rem;margin-bottom:1rem}
+  .doc p{margin-bottom:.45rem}
+  .doc__prop{padding:.6rem .9rem;margin:.7rem 0}
+  .doc__price{padding:.55rem;margin:.6rem 0}
+  .doc__price strong{font-size:1.9rem}
+  .doc__net td{padding:.28rem .2rem}
+  .doc h4{margin:1rem 0 .4rem}
+  .doc ol{gap:.2rem}
+  .doc__signs{margin-top:1.1rem}
+  .doc__signs span{height:2.3rem}
+  .doc__foot{margin-top:.8rem;padding-top:.5rem}
+  .doc__interv{margin-top:.7rem}
+  .doc__price strong{background:none!important;color:#b23fd0!important;-webkit-text-fill-color:#b23fd0}
+  .doc__prop{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .doc__rgpd{margin-top:1rem}
   body{background:#fff}
   .header,.tool__form,.kpis,.hist{display:none!important}
   .tool__grid{display:block;padding:0;width:100%}
   .tool__preview{position:static}
-  .doc{box-shadow:none;padding:0;max-height:none;overflow:visible;font-size:10pt}
+  .doc-tabs{display:none!important}
+  .doc{box-shadow:none;padding:0;max-height:none;overflow:visible;font-size:10pt;display:block!important}
+  body[data-print=oferta] #doc2,body[data-print=aceptacion] #doc{display:none!important}
+  body[data-print=both] #doc2{break-before:page;page-break-before:always}
   .doc__price strong,.grad{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .doc__head{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }

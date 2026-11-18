@@ -3,7 +3,7 @@
    ========================================================= */
 window.PROPIA = {
   name: "PROPIA",
-  legalName: "PROPIA Real Estate",          // razón social completa (ej. "Propia Real Estate S.L.")
+  legalName: "Capital LCA, S.L.",           // razón social (la que figura en vuestras ofertas)
   cif: "",                                   // CIF (aparece en las ofertas si se rellena)
   email: "info@propiarealestate.es",
   phone: "",                                 // ej. "+34 600 000 000" (si se deja vacío no se muestra)
@@ -14,6 +14,9 @@ window.PROPIA = {
   // Pega aquí la URL del "Custom webhook" de cada escenario de Make (https://hook.eu2.make.com/...)
   makeWebhookSolicitudes: "",   // se dispara cuando un propietario envía el formulario de la web
   makeWebhookOfertas: "",       // se dispara al pulsar "Guardar oferta" en el generador
+  // Escenario "PROPIA Web - Leer oferta de Knack": devuelve los datos de una oferta de Knack
+  // por su nº. Pide una clave que NO está en el código (se escribe en el generador la primera vez).
+  makeWebhookKnack: "https://hook.eu1.make.com/k6pobf8kmzh49ketmmj26hx57kbesvxi",
 
   // Alternativa sin Make: URL de Formspree u otro servicio. Si todo está vacío,
   // se abre el correo del visitante con la solicitud ya redactada.
