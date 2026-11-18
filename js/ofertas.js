@@ -29,7 +29,7 @@
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
     notaria: 1500,               // (E18)
-    itp: { MD: 0.02, CT: 0.03, VC: 0.08 },  // (E19) Madrid, Cataluña, Valencia; cualquier otra: 8 %
+    itp: { MD: 0.02, CT: 0.10, VC: 0.09 },  // Madrid 2 %, Cataluña 10 %, Valencia 9 % (actualizado; el Excel tenía CT 3 %, VC 8 %)
     zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia" }
   };
 
@@ -48,7 +48,7 @@
   function calc() {
     const venta = num("venta"), sup = num("sup");
     const reforma = f.reforma.value === "SI", redis = f.redis.value === "SI";
-    const zona = f.zonaItp.value, itpR = P.itp[zona] ?? 0.08;
+    const zona = f.zonaItp.value, itpR = P.itp[zona] ?? 0.10;
 
     const plazo = reforma ? P.plazoConReforma : P.plazoSinReforma;                                   // A3
     const factor = venta < P.umbralPrecio ? plazo / 30 * P.factorBajo : plazo / 30 * P.factorAlto;    // E4
