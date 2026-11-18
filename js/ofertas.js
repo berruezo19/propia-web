@@ -30,8 +30,8 @@
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
     notaria: 1500,               // (E18)
-    itp: { MD: 0.02, CT: 0.10, VC: 0.09 },  // H4: Madrid 2 %, Cataluña 10 %, Valencia 9 % (sobre el precio de compra)
-    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia" }
+    itp: { MD: 0.02, CT: 0.10, VC: 0.09, VC3: 0.03 },  // H4: Madrid 2 %, Cataluña 10 %, Valencia 9 % (sobre el precio de compra)
+    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia", VC3: "Valencia (3 %)" }
   };
 
   // Superficie de reforma = m² construidos por defecto
