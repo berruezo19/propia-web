@@ -12,7 +12,7 @@ window.PROPIA = {
 
   // ===== Integración con Make (y desde Make → Slack, Sheets, CRM…) =====
   // Pega aquí la URL del "Custom webhook" de cada escenario de Make (https://hook.eu2.make.com/...)
-  makeWebhookSolicitudes: "",   // se dispara cuando un propietario envía el formulario de la web
+  makeWebhookSolicitudes: "https://hook.eu1.make.com/hlpxabjctdie9wj5l986tk336sjve8hv",   // "PROPIA Web - Leads de la calculadora": email con cada lead
   makeWebhookOfertas: "",       // se dispara al pulsar "Guardar oferta" en el generador
   // Escenario "PROPIA Web - Leer oferta de Knack": devuelve los datos de una oferta de Knack
   // por su nº. Pide una clave que NO está en el código (se escribe en el generador la primera vez).

@@ -115,7 +115,7 @@ h1,h2,h3,h4{color:var(--ink);line-height:1.12;letter-spacing:-.02em;font-weight:
 .cases p{font-size:.92rem;color:var(--muted)}
 
 /* Formulario */
-.progress{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1.6rem;position:sticky;top:84px;z-index:5;background:rgba(250,247,251,.92);backdrop-filter:blur(8px);padding:.6rem 0;counter-reset:p}
+.progress{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.6rem;position:sticky;top:84px;z-index:5;background:rgba(250,247,251,.92);backdrop-filter:blur(8px);padding:.6rem 0;counter-reset:p}
 .progress li{counter-increment:p;font-size:.8rem;font-weight:600;color:var(--muted);text-align:center;padding-top:.7rem;border-top:4px solid #e7e3ec;transition:.3s}
 .progress li::before{content:counter(p) ". "}
 .progress li.is-on{color:var(--ink);border-image:var(--grad) 1}
@@ -140,9 +140,22 @@ input[type=radio],input[type=checkbox]{width:18px;height:18px;padding:0;accent-c
 .form-error{color:var(--err);font-weight:500;text-align:center;min-height:1.4em}
 .form-submit{display:grid;justify-items:center;gap:.7rem;text-align:center}
 .form-submit small{color:var(--muted)}
-.success{text-align:center;background:#fff;border-radius:var(--r);padding:3.5rem 2rem;box-shadow:var(--shadow-lg);display:grid;justify-items:center;gap:1rem}
-.success h3{font-size:1.6rem}
-.success p{color:var(--muted);max-width:460px}
+.panel[hidden],.request[hidden],.result[hidden]{display:none}
+.radio.invalid>span{color:var(--err)}
+.span2{grid-column:1/-1}
+.hint-text{font-weight:400;color:var(--muted);font-size:.78rem}
+.step-nav{display:flex;justify-content:flex-end;gap:.8rem;flex-wrap:wrap;margin-top:.4rem}
+/* Resultado de la calculadora */
+.result{text-align:center;background:#fff;border-radius:var(--r);padding:3rem 2rem;box-shadow:var(--shadow-lg);display:grid;justify-items:center;gap:.9rem;border:1px solid #f1dbe9}
+.result .pill{margin:0}
+.result h3{font-size:1.3rem;color:var(--muted);font-weight:600}
+.result__price{font-size:clamp(2.6rem,8vw,4rem);font-weight:800;letter-spacing:-.03em;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.result__sub{color:var(--text);max-width:520px}
+.result__list{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem 1.4rem;margin:.4rem 0;font-size:.92rem}
+.result__list li{display:flex;align-items:center;gap:.4rem}
+.result__list svg{color:var(--pink);stroke-width:2.6}
+.result__next{background:var(--soft);border-radius:var(--r-sm);padding:1rem 1.2rem;max-width:560px;font-size:.95rem}
+.result__legal{font-size:.75rem;color:var(--muted);max-width:520px}
 
 /* FAQ */
 .faq{display:grid;gap:.8rem}

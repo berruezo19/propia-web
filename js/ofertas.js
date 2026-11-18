@@ -13,26 +13,8 @@
   const fecha = d => d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
   const num = k => parseFloat(f.elements[k].value) || 0;
 
-  /* ---------- Parámetros de la calculadora PROPIA (hoja "Compra directa") ----------
-     Cambia aquí cualquier valor si se actualiza el Excel. */
-  const P = {
-    margenOferta: 0.25,          // margen de la oferta (celda H3) → precio de compra neto (E3, el que lee Make)
-    margenMinimo: 0.20,          // margen mínimo (celda H2) → precio máximo para negociar (E2)
-    plazoConReforma: 150,        // días (A3)
-    plazoSinReforma: 105,
-    umbralPrecio: 250000,        // € precio de venta (E4, E16, E17)
-    factorBajo: 0.024,           // corrección mensual si venta < 250.000 € (E4)
-    factorAlto: 0.016,           // corrección mensual si venta ≥ 250.000 €
-    honCompraPct: 0.03, honCompraMin: 3000,   // honorarios de compra + IVA (E15)
-    honVentaPct: 0.03, honVentaMin: 10000,    // honorarios de venta: completa hasta 10.000 € (E16)
-    iva: 1.21,
-    reformaRedisM2Alto: 900, reformaRedisM2Bajo: 700,   // €/m² con redistribución (E17)
-    reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
-    sinReforma: 12100,
-    notaria: 1500,               // (E18)
-    itp: { MD: 0.02, CT: 0.10, VC: 0.09, VC3: 0.03 },  // H4: Madrid 2 %, Cataluña 10 %, Valencia 9 % (sobre el precio de compra)
-    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia", VC3: "Valencia (3 %)" }
-  };
+  /* Parámetros y cálculo: js/calculadora.js (compartido con la web pública) */
+  const P = window.PROPIA_CALC.P;
 
   // Superficie de reforma = m² construidos por defecto
   f.m2c.addEventListener("input", () => { if (!f.sup.dataset.touched) f.sup.value = f.m2c.value; });
@@ -43,52 +25,15 @@
   let current = { no: newNo(), fecha: new Date().toISOString() };
 
   /* ---------- Cálculo ---------- */
-  /* Réplica de la hoja de Google "Compra directa" (versión con horquilla de margen 20–25 %).
-     Precio de compra P tal que margen = beneficio / coste total = m:
-       coste = P + honorarios compra(P) + honorarios venta + reforma + notaría + ITP·P = venta corregida / (1 + m)
-     Se despeja P de forma exacta (sin referencia circular) y se redondea a la centena inferior. */
   function calc() {
-    const venta = num("venta"), sup = num("sup");
-    const reforma = f.reforma.value === "SI", redis = f.redis.value === "SI";
-    const zona = f.zonaItp.value, itpR = P.itp[zona] ?? 0.10;
-
-    const plazo = reforma ? P.plazoConReforma : P.plazoSinReforma;                                   // A3
-    const factor = venta < P.umbralPrecio ? plazo / 30 * P.factorBajo : plazo / 30 * P.factorAlto;    // E4
-    const ventaCorr = venta * (1 - factor);                                                           // E5
-
-    const honCompra = B3 => (B3 * P.honCompraPct > P.honCompraMin ? B3 * P.honCompraPct : P.honCompraMin) * P.iva;   // E15
-    const honVenta = venta * P.honVentaPct * P.iva > P.honVentaMin ? 0 : P.honVentaMin - venta * P.honVentaPct * P.iva; // E16
-    const costeReforma = reforma                                                                                      // E17
-      ? (redis ? (venta > P.umbralPrecio ? P.reformaRedisM2Alto : P.reformaRedisM2Bajo) * sup
-               : (venta < P.umbralPrecio ? P.reformaSinRedisBajo : P.reformaSinRedisAlto))
-      : P.sinReforma;
-
-    const hc = P.honCompraPct * P.iva, hcMin = P.honCompraMin * P.iva;           // 0,0363 y 3.630 €
-    const precioPara = m => {                                                     // E2 / E3
-      const R = ventaCorr / (1 + m) - honVenta - costeReforma - P.notaria;
-      const conPct = R / (1 + hc + itpR);
-      const p = conPct > P.honCompraMin / P.honCompraPct ? conPct : (R - hcMin) / (1 + itpR);
-      return Math.max(0, Math.floor(p / 100) * 100);
-    };
-    const calculada = precioPara(P.margenOferta);                                 // oferta (margen 25 %)
-    const precioMax = precioPara(P.margenMinimo);                                 // límite (margen 20 %)
-    const final = num("precioFinal") || calculada;
-
-    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: P.notaria, itp: itpR * final };
-    g.total = g.honCompra + g.honVenta + g.reforma + g.notaria + g.itp;                                  // E20
-    const coste = g.total + final;                                                                       // B11
-    const beneficio = ventaCorr - coste;                                                                 // C11
-    const margen = coste ? beneficio / coste : 0;                                                        // D11
+    const c = window.PROPIA_CALC.calcular({
+      venta: num("venta"), sup: num("sup"), zona: f.zonaItp.value, precioManual: num("precioFinal"),
+      reforma: f.reforma.value === "SI", redis: f.redis.value === "SI"
+    });
     const solicitado = num("precio");
-    return {
-      venta, plazo, factor, ventaCorr, calculada, precioMax, final, g, coste, beneficio, zona, itpR,
-      margen: margen * 100,
-      rent: margen / plazo * 365 * 100,                                                                  // E11
-      sobreMax: final > precioMax,
-      vsSolicitado: solicitado ? (final - solicitado) / solicitado * 100 : null,
-      neto: final - num("cargas"),
-      ok: venta > 0 && (!reforma || !redis || sup > 0)
-    };
+    c.vsSolicitado = solicitado ? (c.final - solicitado) / solicitado * 100 : null;
+    c.neto = c.final - num("cargas");
+    return c;
   }
 
   function update() {
@@ -376,15 +321,19 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
     const m = location.hash.match(/d=([^&]+)/); if (!m) return;
     try {
       const d = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+      const reforma = d.reforma ? (d.reforma === "SI" ? "SI" : "NO") : (d.estado === "A estrenar / reformado" ? "NO" : "SI");
       fill({
-        sup: d.m2c, reforma: d.estado === "A estrenar / reformado" ? "NO" : "SI",
-        nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, cp: d.cp,
+        sup: d.sup || d.m2c, reforma, venta: d.venta || "",
+        zonaItp: ["VC", "CT", "MD", "VC3"].includes(d.zona) ? d.zona : f.zonaItp.value,
+        nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion, cp: d.cp,
         tipo: d.tipo, anio: d.anio, m2c: d.m2c, m2u: d.m2u, planta: d.planta, ascensor: d.ascensor, ocupacion: d.ocupacion,
         precio: d.precio, habban: [d.hab, d.banos].filter(Boolean).join(" / "),
         obs: ""
       });
+      if (d.sup || d.m2c) f.sup.dataset.touched = "1";
+      update();
       const info = [d.cargas && `Libre de cargas: ${d.cargas}`, d.hipoteca && `Hipoteca: ${d.hipoteca}`, d.obs && `Obs.: ${d.obs}`].filter(Boolean).join(" · ");
-      $("#importMsg").innerHTML = `✓ Solicitud importada (${new Date(d.recibida || Date.now()).toLocaleDateString("es-ES")}).${info ? " " + esc(info) : ""} <b>Completa la valoración en el apartado 3.</b>`;
+      $("#importMsg").innerHTML = `✓ Lead de la web importado (${new Date(d.recibida || Date.now()).toLocaleDateString("es-ES")}).${info ? " " + esc(info) : ""} <b>Revisa la valoración en el apartado 3.</b>`;
       $("#importMsg").hidden = false;
       history.replaceState(null, "", location.pathname);
     } catch { msg("No se pudo leer la solicitud del enlace."); }

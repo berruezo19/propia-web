@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=202611181113">
+<link rel="stylesheet" href="css/styles.css?v=202611181129">
 </head>
 <body>
 
@@ -51,7 +51,7 @@
       <a href="#situaciones">Para quién</a>
       <a href="#faq">Preguntas</a>
       <a href="#contacto">Contacto</a>
-      <a href="#formulario" class="btn btn--grad btn--sm nav__cta">Solicitar oferta</a>
+      <a href="#formulario" class="btn btn--grad btn--sm nav__cta">Calcula tu oferta</a>
     </nav>
     <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
   </div>
@@ -66,7 +66,7 @@
     <h1>Vende tu piso <span class="grad">rápido y al contado</span>, sin comisiones ni gastos</h1>
     <p class="hero__lead">PROPIA es la empresa especializada en venta inmediata de inmuebles, ofreciendo compra directa al contado, sin intermediarios y con total seguridad jurídica.</p>
     <div class="hero__cta">
-      <a href="#formulario" class="btn btn--grad btn--lg">Solicitar oferta gratuita <svg><use href="#i-arrow"/></svg></a>
+      <a href="#formulario" class="btn btn--grad btn--lg">Calcula tu oferta gratis <svg><use href="#i-arrow"/></svg></a>
       <a href="#proceso" class="btn btn--line btn--lg">Cómo funciona</a>
     </div>
     <ul class="trust">
@@ -164,94 +164,78 @@
   </div>
 </section>
 
-<!-- FORMULARIO -->
+<!-- FORMULARIO / CALCULADORA DE OFERTA -->
 <section class="section section--soft" id="formulario">
   <div class="container container--narrow">
     <header class="head">
-      <h2>Solicita tu <span class="grad">oferta de compra</span></h2>
-      <p>Completa el formulario y recibe una valoración profesional de tu inmueble</p>
+      <h2>Calcula tu <span class="grad">oferta de compra</span></h2>
+      <p>Responde 6 preguntas y obtén al momento una oferta orientativa por tu vivienda. Gratis y sin compromiso.</p>
     </header>
 
     <ol class="progress" id="progress" aria-hidden="true">
-      <li class="is-on">Propietario</li><li>Inmueble</li><li>Situación</li><li>Visita</li>
+      <li class="is-on">Tu vivienda</li><li>Tus datos</li><li>Tu oferta</li>
     </ol>
 
     <form class="request" id="requestForm" novalidate>
+      <!-- PASO 1 -->
       <fieldset class="panel" data-step="0">
-        <legend>1. Datos del propietario</legend>
+        <legend>1. Tu vivienda</legend>
+        <label>Dirección del inmueble <b>*</b><input name="direccion" required placeholder="Calle, número, piso y puerta" autocomplete="street-address"></label>
         <div class="grid2">
-          <label>Nombre completo <b>*</b><input name="nombre" required placeholder="Tu nombre completo" autocomplete="name"></label>
-          <label>DNI / NIE / Pasaporte <b>*</b><input name="dni" required placeholder="12345678A"></label>
-          <label>Teléfono de contacto <b>*</b><input name="telefono" type="tel" required placeholder="600 000 000" autocomplete="tel"></label>
-          <label>Correo electrónico <b>*</b><input name="email" type="email" required placeholder="tu@email.com" autocomplete="email"></label>
+          <label>Población <b>*</b><input name="poblacion" required placeholder="Barcelona" autocomplete="address-level2"></label>
+          <label>Comunidad <b>*</b>
+            <select name="zona" required>
+              <option value="">Selecciona</option>
+              <option value="CT">Cataluña</option>
+              <option value="MD">Comunidad de Madrid</option>
+              <option value="VC">Comunidad Valenciana</option>
+            </select></label>
+          <label>Superficie (m²) <b>*</b><input name="m2" type="number" min="15" max="2000" required placeholder="90" inputmode="numeric"></label>
+          <label>Valor de mercado estimado (€) <b>*</b>
+            <input name="valor" type="number" min="20000" step="1000" required placeholder="250000" inputmode="numeric">
+            <small class="hint-text">Lo que vale un piso similar ya reformado en tu zona. Si no lo sabes, pon una estimación.</small></label>
+        </div>
+        <div class="radio"><span>¿Necesita reforma? <b>*</b></span>
+          <label><input type="radio" name="reforma" value="SI" required> Sí</label>
+          <label><input type="radio" name="reforma" value="NO"> No, está para entrar a vivir</label>
+        </div>
+        <div class="step-nav"><button class="btn btn--grad btn--lg" type="button" data-next>Continuar <svg><use href="#i-arrow"/></svg></button></div>
+      </fieldset>
+
+      <!-- PASO 2 -->
+      <fieldset class="panel" data-step="1" hidden>
+        <legend>2. ¿A quién enviamos la oferta?</legend>
+        <div class="grid2">
+          <label>Nombre y apellidos <b>*</b><input name="nombre" required autocomplete="name"></label>
+          <label>Teléfono <b>*</b><input name="telefono" type="tel" required placeholder="600 000 000" autocomplete="tel"></label>
+          <label class="span2">Email <b>*</b><input name="email" type="email" required placeholder="tu@email.com" autocomplete="email"></label>
+        </div>
+        <div class="radio"><span>¿Tiene hipoteca pendiente?</span>
+          <label><input type="radio" name="hipoteca" value="Sí"> Sí</label><label><input type="radio" name="hipoteca" value="No"> No</label></div>
+        <label>¿Algo más que debamos saber? <small>(opcional)</small><textarea name="obs" rows="3" placeholder="Herencia, inquilinos, urgencia…"></textarea></label>
+        <label class="check"><input type="checkbox" name="rgpd" required> Acepto la <a href="#">política de privacidad</a> y que PropiaRealEstate me contacte sobre la compra de mi vivienda. <b>*</b></label>
+        <p class="form-error" id="formError" role="alert"></p>
+        <div class="step-nav">
+          <button class="btn btn--line" type="button" data-prev>Atrás</button>
+          <button class="btn btn--grad btn--lg" type="submit" id="submitBtn">Ver mi oferta <svg><use href="#i-send"/></svg></button>
         </div>
       </fieldset>
-
-      <fieldset class="panel" data-step="1">
-        <legend>2. Información del inmueble</legend>
-        <label>Dirección completa (planta y puerta o referencia catastral) <b>*</b><input name="direccion" required placeholder="Calle, número, piso, puerta"></label>
-        <div class="grid2">
-          <label>Código postal / Ciudad / Provincia<input name="cp" placeholder="08001, Barcelona"></label>
-          <label>Tipo de inmueble
-            <select name="tipo"><option value="">Selecciona tipo</option><option>Piso</option><option>Ático</option><option>Dúplex</option><option>Casa / Chalet</option><option>Local</option><option>Edificio</option><option>Otro</option></select></label>
-          <label>Superficie construida (m²)<input name="m2c" type="number" min="10" placeholder="90"></label>
-          <label>Superficie útil (m²)<input name="m2u" type="number" min="10" placeholder="80"></label>
-          <label>Número de habitaciones<input name="hab" type="number" min="0" placeholder="3"></label>
-          <label>Número de baños<input name="banos" type="number" min="0" placeholder="2"></label>
-          <label>Año de construcción<input name="anio" type="number" min="1800" max="2030" placeholder="1990"></label>
-          <label>Estado actual del inmueble
-            <select name="estado"><option value="">Selecciona estado</option><option>A estrenar / reformado</option><option>Buen estado</option><option>Necesita reforma parcial</option><option>Necesita reforma integral</option></select></label>
-          <label>Planta<input name="planta" placeholder="3º"></label>
-          <label>¿Tiene ascensor?
-            <select name="ascensor"><option value="">—</option><option>Sí</option><option>No</option></select></label>
-        </div>
-      </fieldset>
-
-      <fieldset class="panel" data-step="2">
-        <legend>3. Situación legal y económica</legend>
-        <div class="grid2">
-          <div class="radio"><span>¿El inmueble está libre de cargas?</span>
-            <label><input type="radio" name="cargas" value="Sí"> Sí</label><label><input type="radio" name="cargas" value="No"> No</label><label><input type="radio" name="cargas" value="No lo sé"> No lo sé</label></div>
-          <div class="radio"><span>¿Tiene hipoteca pendiente?</span>
-            <label><input type="radio" name="hipoteca" value="Sí"> Sí</label><label><input type="radio" name="hipoteca" value="No"> No</label></div>
-          <div class="radio"><span>¿Está ocupado actualmente?</span>
-            <label><input type="radio" name="ocupacion" value="Vacío"> Vacío</label><label><input type="radio" name="ocupacion" value="Vivo yo"> Vivo yo</label><label><input type="radio" name="ocupacion" value="Alquilado"> Alquilado</label></div>
-          <label>Precio de venta solicitado (€)<input name="precio" type="number" min="0" step="1000" placeholder="150000"></label>
-        </div>
-      </fieldset>
-
-      <fieldset class="panel" data-step="3">
-        <legend>4. Disponibilidad para visita</legend>
-        <div class="grid2">
-          <div class="radio"><span>Preferencia de horario</span>
-            <label><input type="radio" name="horario" value="Mañana"> Mañana</label><label><input type="radio" name="horario" value="Tarde"> Tarde</label><label><input type="radio" name="horario" value="Fin de semana"> Fin de semana</label></div>
-          <label>Fecha sugerida para visita<input name="fecha" type="date"></label>
-        </div>
-      </fieldset>
-
-      <fieldset class="panel">
-        <legend>5. Observaciones</legend>
-        <label class="sr">Observaciones</label>
-        <textarea name="obs" rows="4" placeholder="Añade cualquier información adicional que consideres relevante…"></textarea>
-      </fieldset>
-
-      <fieldset class="panel">
-        <legend>6. Autorización</legend>
-        <label class="check"><input type="checkbox" name="rgpd" required> Confirmo que los datos proporcionados son verídicos y autorizo a PROPIA a contactar conmigo para la gestión de la compra directa del inmueble, conforme a la <a href="#">política de privacidad</a>. <b>*</b></label>
-      </fieldset>
-
-      <p class="form-error" id="formError" role="alert"></p>
-      <div class="form-submit">
-        <button class="btn btn--grad btn--lg" type="submit" id="submitBtn">Enviar solicitud <svg><use href="#i-send"/></svg></button>
-        <small>Los campos marcados con * son obligatorios · Respuesta en menos de 24 h</small>
-      </div>
     </form>
 
-    <div class="success" id="success" hidden>
-      <span class="ico ico--solid ico--xl"><svg><use href="#i-check"/></svg></span>
-      <h3>¡Solicitud recibida!</h3>
-      <p>Gracias. Un miembro del equipo de PROPIA te contactará en menos de 24 horas para coordinar la visita técnica.</p>
-      <button class="btn btn--line" id="newRequest">Enviar otra solicitud</button>
+    <!-- PASO 3: RESULTADO -->
+    <div class="result" id="result" hidden>
+      <p class="pill"><svg><use href="#i-badge"/></svg> Oferta orientativa</p>
+      <h3>Te podemos ofrecer</h3>
+      <p class="result__price" id="resultPrice">—</p>
+      <p class="result__sub">por tu vivienda en <strong id="resultAddr"></strong>, al contado y sin comisiones.</p>
+      <ul class="result__list">
+        <li><svg><use href="#i-check"/></svg>Pago al contado en notaría</li>
+        <li><svg><use href="#i-check"/></svg>Firma en menos de 15 días</li>
+        <li><svg><use href="#i-check"/></svg>Sin comisiones ni gastos de gestión</li>
+      </ul>
+      <p class="result__next"><strong>¿Y ahora?</strong> Un asesor de PropiaRealEstate te llamará en menos de 24 h para concertar la visita técnica y confirmarte la oferta definitiva.</p>
+      <p class="result__legal">Importe orientativo calculado con los datos facilitados. La oferta firme se emite tras la visita técnica y el estudio legal del inmueble.</p>
+      <button class="btn btn--line" id="newRequest" type="button">Calcular otra vivienda</button>
     </div>
   </div>
 </section>
@@ -297,9 +281,10 @@
   <div class="container footer__bottom"><span id="copy"></span></div>
 </footer>
 
-<a href="#formulario" class="mobile-cta btn btn--grad">Solicitar oferta gratuita</a>
+<a href="#formulario" class="mobile-cta btn btn--grad">Calcula tu oferta gratis</a>
 
-<script src="js/config.js?v=202611181113"></script>
-<script src="js/main.js?v=202611181113"></script>
+<script src="js/config.js?v=202611181129"></script>
+<script src="js/calculadora.js?v=202611181129"></script>
+<script src="js/main.js?v=202611181129"></script>
 </body>
 </html>
