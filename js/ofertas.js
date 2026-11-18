@@ -29,7 +29,8 @@
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
     notaria: 1500,               // (E18)
-    itp: { MD: 0.02, CT: 0.03, VC: 0.08 }   // (E19) cualquier otra zona: 8 %
+    itp: { MD: 0.02, CT: 0.03, VC: 0.08 },  // (E19) Madrid, Cataluña, Valencia; cualquier otra: 8 %
+    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia" }
   };
 
   // Superficie de reforma = m² construidos por defecto
@@ -113,7 +114,7 @@
         <tr><td>Honorarios de venta</td><td>${eur(c.g.honVenta)}</td></tr>
         <tr><td>Reforma</td><td>${eur(c.g.reforma)}</td></tr>
         <tr><td>Notaría</td><td>${eur(c.g.notaria)}</td></tr>
-        <tr><td>ITP (${c.zona} · ${p1(c.itpR * 100)})</td><td>${eur(c.g.itp)}</td></tr>
+        <tr><td>ITP (${P.zonas[c.zona] || c.zona} · ${p1(c.itpR * 100)})</td><td>${eur(c.g.itp)}</td></tr>
         <tr class="tot"><td>Total gastos</td><td>${eur(c.g.total)}</td></tr>
       </table></div>
       <div class="calc__group"><h5>Rentabilidad${manual ? ` <small>con ${eur(c.final)}</small>` : ""}</h5><table>
