@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Generador de ofertas · PROPIA</title>
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/ofertas.css">
+</head>
+<body class="tool">
+
+<header class="header is-scrolled">
+  <div class="container container--wide header__in">
+    <a class="logo" href="/"><img src="img/logo.svg" alt="" width="30" height="30"><span>Propia</span><em class="tag">Generador de ofertas</em></a>
+    <div class="tool__top">
+      <button class="btn btn--line btn--sm" id="btnHistory" type="button">Ofertas guardadas <span class="count" id="histCount">0</span></button>
+      <button class="btn btn--line btn--sm" id="btnNew" type="button">Nueva</button>
+    </div>
+  </div>
+</header>
+
+<main class="container container--wide tool__grid">
+  <!-- ======= FORMULARIO ======= -->
+  <form id="of" class="tool__form" autocomplete="off" novalidate>
+    <p class="import" id="importMsg" hidden></p>
+
+    <fieldset class="panel">
+      <legend>1. Propietario</legend>
+      <div class="grid2">
+        <label>Nombre completo <b>*</b><input name="nombre" required></label>
+        <label>DNI / NIE <b>*</b><input name="dni" required></label>
+        <label>Teléfono<input name="telefono" type="tel"></label>
+        <label>Email<input name="email" type="email"></label>
+      </div>
+    </fieldset>
+
+    <fieldset class="panel">
+      <legend>2. Inmueble</legend>
+      <label>Dirección completa / Ref. catastral <b>*</b><input name="direccion" required></label>
+      <div class="grid3">
+        <label>CP / Ciudad<input name="cp"></label>
+        <label>Tipo<input name="tipo" list="tipos"></label>
+        <label>Año<input name="anio" type="number"></label>
+        <label>m² construidos <b>*</b><input name="m2c" type="number" min="10" required></label>
+        <label>m² útiles<input name="m2u" type="number"></label>
+        <label>Hab. / Baños<input name="habban" placeholder="3 / 2"></label>
+        <label>Planta<input name="planta" placeholder="3º"></label>
+        <label>Ascensor<select name="ascensor"><option value="">—</option><option>Sí</option><option>No</option></select></label>
+        <label>Ocupación<select name="ocupacion"><option value="">—</option><option>Vacío</option><option>Vivo yo</option><option>Alquilado</option></select></label>
+      </div>
+      <datalist id="tipos"><option>Piso</option><option>Ático</option><option>Dúplex</option><option>Casa / Chalet</option><option>Local</option></datalist>
+      <label>Precio solicitado por el propietario (€)<input name="precio" type="number" step="1000"></label>
+    </fieldset>
+
+    <fieldset class="panel panel--calc">
+      <legend>3. Valoración y cálculo de la oferta <small>(interno, no aparece en el documento)</small></legend>
+      <div class="grid2">
+        <label>Zona (referencia)
+          <select name="zona" id="zona"></select></label>
+        <label>Valor de mercado reformado (€/m²) <b>*</b><input name="eurm2" type="number" step="50" required></label>
+        <label>Estado del inmueble
+          <select name="estado" id="estado">
+            <option value="0">A estrenar / reformado</option>
+            <option value="120">Buen estado</option>
+            <option value="450" selected>Necesita reforma parcial</option>
+            <option value="850">Necesita reforma integral</option>
+          </select></label>
+        <label>Coste de reforma (€/m²)<input name="reformam2" type="number" step="10" value="450"></label>
+        <label>Ajuste de valor (%) <span class="hint" title="Planta baja/interior, sin ascensor, vistas, terraza…">?</span><input name="ajuste" type="number" step="1" value="0"></label>
+        <label>Margen objetivo PROPIA (%)<input name="margen" type="number" step="0.5" value="15"></label>
+        <label>Gastos de compra (% ITP, notaría, registro)<input name="gcompra" type="number" step="0.5" value="11"></label>
+        <label>Gastos de reventa (% comercialización, plusvalía)<input name="gventa" type="number" step="0.5" value="4"></label>
+        <label>Coste de tenencia (€) <span class="hint" title="IBI, comunidad, suministros y financiación durante la operación">?</span><input name="tenencia" type="number" step="100" value="3000"></label>
+        <label>Hipoteca / cargas a cancelar (€)<input name="cargas" type="number" step="100" value="0"></label>
+      </div>
+      <p class="auto-adjust" id="autoAdjust"></p>
+
+      <div class="calc" id="calc"></div>
+
+      <label class="final">Precio final ofertado (€) <small>déjalo vacío para usar el calculado</small>
+        <input name="precioFinal" type="number" step="500" placeholder="Calculado automáticamente"></label>
+    </fieldset>
+
+    <fieldset class="panel">
+      <legend>4. Condiciones de la oferta</legend>
+      <div class="grid2">
+        <label>Validez de la oferta (días)<input name="validez" type="number" min="1" value="7"></label>
+        <label>Firma ante notario como máximo en (días desde aceptación)<input name="plazo" type="number" min="1" value="15"></label>
+        <label>Señal a la aceptación (€) <small>0 = sin señal</small><input name="senal" type="number" step="500" value="0"></label>
+        <label>Entrega de llaves
+          <select name="llaves"><option>En el acto de la firma</option><option>15 días tras la firma</option><option>30 días tras la firma</option></select></label>
+      </div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="c_gastos" checked> PROPIA asume los gastos de notaría, registro y gestoría de la compraventa</label>
+        <label class="check"><input type="checkbox" name="c_comision" checked> Sin comisiones ni honorarios de intermediación</label>
+        <label class="check"><input type="checkbox" name="c_estado" checked> Compra del inmueble en su estado actual, sin obligación de reformar ni vaciar</label>
+        <label class="check"><input type="checkbox" name="c_cancel" checked> Cancelación de hipoteca y cargas con cargo al precio, gestionada por PROPIA</label>
+        <label class="check"><input type="checkbox" name="c_plusvalia" checked> Plusvalía municipal (IIVTNU) a cargo de la parte vendedora, conforme a ley</label>
+        <label class="check"><input type="checkbox" name="c_neto"> Mostrar al propietario el importe neto estimado tras cancelar cargas</label>
+      </div>
+      <label>Condiciones adicionales / observaciones<textarea name="obs" rows="3"></textarea></label>
+      <label>Firmado por (PROPIA)<input name="firmante" placeholder="Nombre y cargo"></label>
+    </fieldset>
+
+    <div class="tool__actions">
+      <button class="btn btn--grad" type="button" id="btnPrint">Descargar PDF / Imprimir</button>
+      <button class="btn btn--line" type="button" id="btnMail">Enviar al propietario</button>
+      <button class="btn btn--line" type="button" id="btnSave">Guardar oferta</button>
+    </div>
+    <p class="tool__msg" id="msg" role="status"></p>
+  </form>
+
+  <!-- ======= VISTA PREVIA ======= -->
+  <aside class="tool__preview">
+    <div class="kpis" id="kpis"></div>
+    <article class="doc" id="doc"></article>
+  </aside>
+</main>
+
+<!-- Historial -->
+<dialog class="hist" id="hist">
+  <header><h3>Ofertas guardadas</h3><button class="x" id="histClose" aria-label="Cerrar">×</button></header>
+  <p class="hist__note">Se guardan en este navegador. Exporta una copia de seguridad de vez en cuando.</p>
+  <ul id="histList"></ul>
+  <footer>
+    <button class="btn btn--line btn--sm" id="histExport" type="button">Exportar (JSON)</button>
+    <label class="btn btn--line btn--sm">Importar<input type="file" id="histImport" accept="application/json" hidden></label>
+  </footer>
+</dialog>
+
+<script src="js/config.js"></script>
+<script src="js/ofertas.js"></script>
+</body>
+</html>

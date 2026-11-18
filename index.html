@@ -1,336 +1,305 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Propia Real Estate · Inmobiliaria</title>
-  <meta name="description" content="Propia Real Estate: compra, venta y alquiler de viviendas con asesoramiento integral. Valoración gratuita y generador de ofertas de compra.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROPIA · Vende tu piso rápido y al contado, sin comisiones</title>
+<meta name="description" content="PROPIA compra tu piso directamente, al contado, sin intermediarios ni comisiones. Estudio técnico y legal completo y firma ante notario en menos de 15 días.">
+<link rel="icon" href="img/logo.svg" type="image/svg+xml">
+<meta property="og:title" content="PROPIA · Vende tu piso rápido y al contado">
+<meta property="og:description" content="Compra directa de inmuebles, sin comisiones ni gastos. Firma ante notario en 15 días.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- ============ CABECERA ============ -->
+<!-- Iconos -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ef3e6d"/><stop offset="1" stop-color="#a64bf4"/></linearGradient>
+  </defs>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-badge" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="m2 2 7.586 7.586"/><circle cx="11" cy="11" r="2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/></symbol>
+  <symbol id="i-euro" viewBox="0 0 24 24"><path d="M4 10h12M4 14h9M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></symbol>
+</svg>
+
 <header class="header" id="top">
-  <div class="container header__inner">
-    <a href="#top" class="logo" aria-label="Propia Real Estate, inicio">
-      <span class="logo__mark">P</span>
-      <span class="logo__text">Propia<small>Real Estate</small></span>
-    </a>
-    <button class="nav-toggle" aria-label="Abrir menú" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav" aria-label="Principal">
-      <a href="#inmuebles">Inmuebles</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#nosotros">Nosotros</a>
-      <a href="#ofertas">Generador de ofertas</a>
-      <a href="#contacto" class="btn btn--small">Contacto</a>
+  <div class="container header__in">
+    <a class="logo" href="#top" aria-label="PROPIA, inicio"><img src="img/logo.svg" alt="" width="34" height="34"><span>Propia</span></a>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <a href="#beneficios">Beneficios</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#situaciones">Para quién</a>
+      <a href="#faq">Preguntas</a>
+      <a href="#contacto">Contacto</a>
+      <a href="#formulario" class="btn btn--grad btn--sm nav__cta">Solicitar oferta</a>
     </nav>
+    <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
   </div>
 </header>
 
 <main>
-<!-- ============ HERO ============ -->
+<!-- HERO -->
 <section class="hero">
-  <div class="container hero__inner">
-    <div class="hero__copy">
-      <p class="eyebrow">Inmobiliaria de confianza</p>
-      <h1>Tu próxima casa,<br><em>con quien la conoce.</em></h1>
-      <p class="lead">Compramos, vendemos y alquilamos contigo. Asesoramiento personal, valoración real de mercado y acompañamiento hasta la firma en notaría.</p>
-      <div class="hero__cta">
-        <a href="#inmuebles" class="btn">Ver inmuebles</a>
-        <a href="#valoracion" class="btn btn--ghost">Valorar mi vivienda</a>
-      </div>
+  <div class="hero__blob hero__blob--1"></div><div class="hero__blob hero__blob--2"></div>
+  <div class="container hero__in">
+    <p class="pill"><svg><use href="#i-badge"/></svg> Compra directa de inmuebles</p>
+    <h1>Vende tu piso <span class="grad">rápido y al contado</span>, sin comisiones ni gastos</h1>
+    <p class="hero__lead">PROPIA es la empresa especializada en venta inmediata de inmuebles, ofreciendo compra directa al contado, sin intermediarios y con total seguridad jurídica.</p>
+    <div class="hero__cta">
+      <a href="#formulario" class="btn btn--grad btn--lg">Solicitar oferta gratuita <svg><use href="#i-arrow"/></svg></a>
+      <a href="#proceso" class="btn btn--line btn--lg">Cómo funciona</a>
     </div>
-
-    <form class="search-card" id="searchForm">
-      <h2>Busca tu inmueble</h2>
-      <label>Operación
-        <select name="op">
-          <option value="">Todas</option>
-          <option value="venta">Comprar</option>
-          <option value="alquiler">Alquilar</option>
-        </select>
-      </label>
-      <label>Tipo
-        <select name="tipo">
-          <option value="">Todos</option>
-          <option>Piso</option>
-          <option>Casa</option>
-          <option>Ático</option>
-          <option>Local</option>
-        </select>
-      </label>
-      <label>Precio máximo
-        <select name="max">
-          <option value="">Sin límite</option>
-          <option value="1500">1.500 €/mes</option>
-          <option value="200000">200.000 €</option>
-          <option value="350000">350.000 €</option>
-          <option value="600000">600.000 €</option>
-        </select>
-      </label>
-      <button class="btn btn--block" type="submit">Buscar</button>
-    </form>
+    <ul class="trust">
+      <li><span class="ico"><svg><use href="#i-shield"/></svg></span>Seguridad jurídica</li>
+      <li><span class="ico"><svg><use href="#i-clock"/></svg></span>Firma en 15 días</li>
+      <li><span class="ico"><svg><use href="#i-badge"/></svg></span>Sin comisiones</li>
+    </ul>
   </div>
-  <ul class="container stats">
-    <li><strong data-count="15">0</strong><span>años de experiencia</span></li>
-    <li><strong data-count="850">0</strong><span>operaciones cerradas</span></li>
-    <li><strong data-count="98">0</strong><span>% clientes satisfechos</span></li>
-    <li><strong data-count="45">0</strong><span>días de media en vender</span></li>
-  </ul>
 </section>
 
-<!-- ============ INMUEBLES ============ -->
-<section class="section" id="inmuebles">
+<!-- CIFRAS -->
+<section class="numbers">
+  <div class="container numbers__in">
+    <div><strong>0 €</strong><span>de comisión para ti</span></div>
+    <div><strong>48 h</strong><span>para visitar tu inmueble</span></div>
+    <div><strong>&lt; 15 días</strong><span>hasta la firma en notaría</span></div>
+    <div><strong>100 %</strong><span>pago al contado</span></div>
+  </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="section" id="beneficios">
   <div class="container">
-    <div class="section__head">
-      <p class="eyebrow">Cartera</p>
-      <h2>Inmuebles destacados</h2>
-      <div class="filters" role="tablist">
-        <button class="chip is-active" data-filter="">Todos</button>
-        <button class="chip" data-filter="venta">Venta</button>
-        <button class="chip" data-filter="alquiler">Alquiler</button>
-      </div>
+    <header class="head">
+      <h2>Por qué elegir <span class="grad">PROPIA</span></h2>
+      <p>Una alternativa real para vender tu casa sin complicaciones</p>
+    </header>
+    <div class="compare">
+      <article class="compare__card compare__card--propia">
+        <h3><span class="ico ico--solid"><svg><use href="#i-check"/></svg></span>Con PROPIA</h3>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Compra directa sin comisiones</li>
+          <li><svg><use href="#i-check"/></svg>Pago al contado</li>
+          <li><svg><use href="#i-check"/></svg>Sin gastos de gestión</li>
+          <li><svg><use href="#i-check"/></svg>Estudio técnico y legal completo</li>
+          <li><svg><use href="#i-check"/></svg>Firma ante notario en menos de 15 días</li>
+          <li><svg><use href="#i-check"/></svg>Compramos el piso tal y como está</li>
+        </ul>
+      </article>
+      <article class="compare__card">
+        <h3><span class="ico ico--mute"><svg><use href="#i-x"/></svg></span>Venta tradicional</h3>
+        <ul>
+          <li><svg><use href="#i-x"/></svg>Comisiones de agencia (3–5 %)</li>
+          <li><svg><use href="#i-x"/></svg>Meses de espera sin garantías</li>
+          <li><svg><use href="#i-x"/></svg>Visitas interminables</li>
+          <li><svg><use href="#i-x"/></svg>Incertidumbre hasta el último día</li>
+          <li><svg><use href="#i-x"/></svg>Posibles caídas de operación</li>
+          <li><svg><use href="#i-x"/></svg>Reformas y arreglos antes de vender</li>
+        </ul>
+      </article>
     </div>
-    <div class="grid" id="propertyGrid"><!-- generado por JS --></div>
-    <p class="empty" id="emptyMsg" hidden>No hay inmuebles con esos criterios. <a href="#contacto">Cuéntanos qué buscas</a> y te avisamos.</p>
+    <p class="note">Nos diferenciamos de las plataformas digitales convencionales porque ofrecemos una venta segura y personalizada, pensada para propietarios que buscan resultados reales.</p>
   </div>
 </section>
 
-<!-- ============ SERVICIOS ============ -->
-<section class="section section--alt" id="servicios">
+<!-- PROCESO -->
+<section class="section section--soft" id="proceso">
   <div class="container">
-    <div class="section__head">
-      <p class="eyebrow">Qué hacemos</p>
-      <h2>Servicios integrales</h2>
-    </div>
-    <div class="services">
-      <article class="service">
-        <div class="service__icon">⌂</div>
-        <h3>Venta de inmuebles</h3>
-        <p>Valoración, reportaje fotográfico profesional, difusión en portales y filtrado de compradores solventes.</p>
-      </article>
-      <article class="service">
-        <div class="service__icon">⚿</div>
-        <h3>Alquiler y gestión</h3>
-        <p>Selección de inquilinos, contrato, seguro de impago e inventario. Gestión mensual si lo necesitas.</p>
-      </article>
-      <article class="service">
-        <div class="service__icon">€</div>
-        <h3>Financiación</h3>
-        <p>Estudio de viabilidad hipotecaria y negociación con entidades para conseguir las mejores condiciones.</p>
-      </article>
-      <article class="service">
-        <div class="service__icon">§</div>
-        <h3>Asesoría legal</h3>
-        <p>Nota simple, cargas, contrato de arras y acompañamiento en notaría. Sin sorpresas.</p>
-      </article>
-    </div>
+    <header class="head">
+      <h2>Cómo vender tu piso con <span class="grad">PROPIA</span></h2>
+      <p>Un proceso claro, estructurado y sin sorpresas</p>
+    </header>
+    <ol class="steps">
+      <li class="step"><span class="step__n">01</span><span class="ico"><svg><use href="#i-search"/></svg></span>
+        <h3>Visita técnica al inmueble</h3>
+        <p>Organizamos la visita de un técnico especializado que realiza un estudio exhaustivo del estado del inmueble, elaborando un informe completo con memoria escrita, planos y archivo fotográfico.</p></li>
+      <li class="step"><span class="step__n">02</span><span class="ico"><svg><use href="#i-clip"/></svg></span>
+        <h3>Estudio legal y de viabilidad</h3>
+        <p>Nuestro equipo analiza el estado físico y la situación legal de la finca para garantizar que la operación cumple con todos los requisitos necesarios antes de generar la oferta.</p></li>
+      <li class="step"><span class="step__n">03</span><span class="ico"><svg><use href="#i-file"/></svg></span>
+        <h3>Oferta de compra directa</h3>
+        <p>Una vez validada la viabilidad, presentamos una oferta de compra directa, detallando condiciones y precio para que puedas decidir con total tranquilidad.</p></li>
+      <li class="step"><span class="step__n">04</span><span class="ico"><svg><use href="#i-pen"/></svg></span>
+        <h3>Firma ante notario</h3>
+        <p>Si aceptas la oferta, preparamos la documentación y en un plazo inferior a 15 días se formaliza la escritura de compraventa ante notario, cerrando la operación de forma rápida y segura.</p></li>
+    </ol>
   </div>
 </section>
 
-<!-- ============ VALORACIÓN ============ -->
-<section class="section" id="valoracion">
-  <div class="container split">
-    <div>
-      <p class="eyebrow">Vender</p>
-      <h2>¿Cuánto vale tu vivienda?</h2>
-      <p>Obtén una estimación orientativa al instante. Después, uno de nuestros agentes la visita y te entrega una valoración profesional sin coste.</p>
-      <ul class="checks">
-        <li>Comparativa con operaciones reales de la zona</li>
-        <li>Informe por escrito en 48 h</li>
-        <li>Sin compromiso de exclusividad</li>
-      </ul>
-    </div>
-    <form class="card" id="valuationForm">
-      <div class="row">
-        <label>Metros útiles<input type="number" name="m2" min="20" value="90" required></label>
-        <label>Zona
-          <select name="zona">
-            <option value="2600">Centro</option>
-            <option value="2100" selected>Ensanche</option>
-            <option value="1700">Periferia</option>
-            <option value="3200">Zona prime</option>
-          </select>
-        </label>
-      </div>
-      <div class="row">
-        <label>Estado
-          <select name="estado">
-            <option value="1.12">A estrenar / reformado</option>
-            <option value="1" selected>Buen estado</option>
-            <option value="0.85">A reformar</option>
-          </select>
-        </label>
-        <label>Extras
-          <select name="extra">
-            <option value="1">Ninguno</option>
-            <option value="1.05">Ascensor / terraza</option>
-            <option value="1.1">Garaje + trastero</option>
-          </select>
-        </label>
-      </div>
-      <button class="btn btn--block" type="submit">Calcular estimación</button>
-      <output class="valuation" id="valuationOut" aria-live="polite"></output>
-    </form>
-  </div>
-</section>
-
-<!-- ============ GENERADOR DE OFERTAS ============ -->
-<section class="section section--dark" id="ofertas">
+<!-- SITUACIONES -->
+<section class="section" id="situaciones">
   <div class="container">
-    <div class="section__head">
-      <p class="eyebrow">Herramienta</p>
-      <h2>Generador de ofertas de compra</h2>
-      <p class="section__sub">Rellena los datos y obtén al momento una propuesta de compra formal, lista para imprimir, descargar en PDF o enviar al propietario.</p>
+    <header class="head">
+      <h2>Te ayudamos en <span class="grad">cualquier situación</span></h2>
+      <p>Cada venta es distinta. Estudiamos tu caso sin compromiso</p>
+    </header>
+    <div class="cases">
+      <article><span class="ico"><svg><use href="#i-users"/></svg></span><h3>Herencias</h3><p>Pisos heredados entre varios herederos, con o sin aceptación de herencia hecha.</p></article>
+      <article><span class="ico"><svg><use href="#i-home"/></svg></span><h3>Separaciones</h3><p>Liquidez inmediata para repartir el patrimonio sin esperas ni tensiones.</p></article>
+      <article><span class="ico"><svg><use href="#i-euro"/></svg></span><h3>Deudas o hipoteca</h3><p>Cancelamos la hipoteca pendiente o los embargos en el mismo acto de la firma.</p></article>
+      <article><span class="ico"><svg><use href="#i-wrench"/></svg></span><h3>Pisos a reformar</h3><p>Compramos el inmueble en su estado actual. Tú no tienes que arreglar nada.</p></article>
+      <article><span class="ico"><svg><use href="#i-key"/></svg></span><h3>Con inquilinos</h3><p>Valoramos inmuebles alquilados o con contratos en vigor.</p></article>
+      <article><span class="ico"><svg><use href="#i-plane"/></svg></span><h3>Cambio de ciudad</h3><p>Vende a distancia: nos ocupamos de visitas, trámites y documentación.</p></article>
     </div>
+  </div>
+</section>
 
-    <div class="offer">
-      <form class="offer__form" id="offerForm" autocomplete="off">
-        <fieldset>
-          <legend>1 · Inmueble</legend>
-          <label>Inmueble de cartera
-            <select name="propertyId" id="offerProperty"><option value="">— Introducir manualmente —</option></select>
-          </label>
-          <label>Dirección del inmueble<input name="address" required placeholder="C/ Ejemplo 12, 3ºB"></label>
-          <div class="row">
-            <label>Referencia<input name="ref" placeholder="PR-0000"></label>
-            <label>Precio de salida (€)<input name="askPrice" type="number" min="0" step="100"></label>
-          </div>
-        </fieldset>
+<!-- FORMULARIO -->
+<section class="section section--soft" id="formulario">
+  <div class="container container--narrow">
+    <header class="head">
+      <h2>Solicita tu <span class="grad">oferta de compra</span></h2>
+      <p>Completa el formulario y recibe una valoración profesional de tu inmueble</p>
+    </header>
 
-        <fieldset>
-          <legend>2 · Comprador</legend>
-          <label>Nombre completo<input name="buyerName" required></label>
-          <div class="row">
-            <label>DNI / NIE<input name="buyerId" required pattern="[A-Za-z0-9\-]{7,12}"></label>
-            <label>Teléfono<input name="buyerPhone" type="tel"></label>
-          </div>
-          <label>Email<input name="buyerEmail" type="email"></label>
-        </fieldset>
+    <ol class="progress" id="progress" aria-hidden="true">
+      <li class="is-on">Propietario</li><li>Inmueble</li><li>Situación</li><li>Visita</li>
+    </ol>
 
-        <fieldset>
-          <legend>3 · Oferta económica</legend>
-          <div class="row">
-            <label>Precio ofertado (€)<input name="offerPrice" type="number" min="0" step="100" required></label>
-            <label>Arras (% del precio)<input name="depositPct" type="number" min="0" max="30" step="0.5" value="10"></label>
-          </div>
-          <div class="row">
-            <label>Tipo de arras
-              <select name="depositType">
-                <option value="penitenciales">Penitenciales (art. 1454 CC)</option>
-                <option value="confirmatorias">Confirmatorias</option>
-                <option value="penales">Penales</option>
-              </select>
-            </label>
-            <label>Señal ahora (€)<input name="signal" type="number" min="0" step="100" value="3000"></label>
-          </div>
-          <label>Forma de pago
-            <select name="financing">
-              <option value="hipoteca">Con financiación hipotecaria</option>
-              <option value="contado">Al contado (fondos propios)</option>
-              <option value="mixta">Mixta (fondos propios + hipoteca)</option>
-            </select>
-          </label>
-          <label class="check"><input type="checkbox" name="mortgageCondition" checked> Condicionada a la concesión de hipoteca</label>
-        </fieldset>
-
-        <fieldset>
-          <legend>4 · Plazos y condiciones</legend>
-          <div class="row">
-            <label>Validez de la oferta (días)<input name="validDays" type="number" min="1" max="30" value="5"></label>
-            <label>Firma en notaría antes de<input name="deedDate" type="date"></label>
-          </div>
-          <label class="check"><input type="checkbox" name="freeCharges" checked> Libre de cargas, arrendatarios y ocupantes</label>
-          <label class="check"><input type="checkbox" name="furniture"> Incluye mobiliario y electrodomésticos</label>
-          <label>Otras condiciones<textarea name="notes" rows="3" placeholder="Ej.: incluye plaza de garaje nº 14"></textarea></label>
-        </fieldset>
-
-        <div class="offer__actions">
-          <button class="btn" type="button" id="printOffer">Imprimir / PDF</button>
-          <button class="btn btn--ghost-light" type="button" id="mailOffer">Enviar por email</button>
-          <button class="btn btn--ghost-light" type="button" id="saveOffer">Guardar borrador</button>
-          <button class="link-btn" type="reset" id="resetOffer">Limpiar</button>
+    <form class="request" id="requestForm" novalidate>
+      <fieldset class="panel" data-step="0">
+        <legend>1. Datos del propietario</legend>
+        <div class="grid2">
+          <label>Nombre completo <b>*</b><input name="nombre" required placeholder="Tu nombre completo" autocomplete="name"></label>
+          <label>DNI / NIE / Pasaporte <b>*</b><input name="dni" required placeholder="12345678A"></label>
+          <label>Teléfono de contacto <b>*</b><input name="telefono" type="tel" required placeholder="600 000 000" autocomplete="tel"></label>
+          <label>Correo electrónico <b>*</b><input name="email" type="email" required placeholder="tu@email.com" autocomplete="email"></label>
         </div>
-        <p class="offer__msg" id="offerMsg" aria-live="polite"></p>
-      </form>
+      </fieldset>
 
-      <div class="offer__preview-wrap">
-        <div class="offer__summary" id="offerSummary"></div>
-        <article class="doc" id="offerDoc" aria-label="Vista previa de la oferta"></article>
+      <fieldset class="panel" data-step="1">
+        <legend>2. Información del inmueble</legend>
+        <label>Dirección completa (planta y puerta o referencia catastral) <b>*</b><input name="direccion" required placeholder="Calle, número, piso, puerta"></label>
+        <div class="grid2">
+          <label>Código postal / Ciudad / Provincia<input name="cp" placeholder="08001, Barcelona"></label>
+          <label>Tipo de inmueble
+            <select name="tipo"><option value="">Selecciona tipo</option><option>Piso</option><option>Ático</option><option>Dúplex</option><option>Casa / Chalet</option><option>Local</option><option>Edificio</option><option>Otro</option></select></label>
+          <label>Superficie construida (m²)<input name="m2c" type="number" min="10" placeholder="90"></label>
+          <label>Superficie útil (m²)<input name="m2u" type="number" min="10" placeholder="80"></label>
+          <label>Número de habitaciones<input name="hab" type="number" min="0" placeholder="3"></label>
+          <label>Número de baños<input name="banos" type="number" min="0" placeholder="2"></label>
+          <label>Año de construcción<input name="anio" type="number" min="1800" max="2030" placeholder="1990"></label>
+          <label>Estado actual del inmueble
+            <select name="estado"><option value="">Selecciona estado</option><option>A estrenar / reformado</option><option>Buen estado</option><option>Necesita reforma parcial</option><option>Necesita reforma integral</option></select></label>
+          <label>Planta<input name="planta" placeholder="3º"></label>
+          <label>¿Tiene ascensor?
+            <select name="ascensor"><option value="">—</option><option>Sí</option><option>No</option></select></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="panel" data-step="2">
+        <legend>3. Situación legal y económica</legend>
+        <div class="grid2">
+          <div class="radio"><span>¿El inmueble está libre de cargas?</span>
+            <label><input type="radio" name="cargas" value="Sí"> Sí</label><label><input type="radio" name="cargas" value="No"> No</label><label><input type="radio" name="cargas" value="No lo sé"> No lo sé</label></div>
+          <div class="radio"><span>¿Tiene hipoteca pendiente?</span>
+            <label><input type="radio" name="hipoteca" value="Sí"> Sí</label><label><input type="radio" name="hipoteca" value="No"> No</label></div>
+          <div class="radio"><span>¿Está ocupado actualmente?</span>
+            <label><input type="radio" name="ocupacion" value="Vacío"> Vacío</label><label><input type="radio" name="ocupacion" value="Vivo yo"> Vivo yo</label><label><input type="radio" name="ocupacion" value="Alquilado"> Alquilado</label></div>
+          <label>Precio de venta solicitado (€)<input name="precio" type="number" min="0" step="1000" placeholder="150000"></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="panel" data-step="3">
+        <legend>4. Disponibilidad para visita</legend>
+        <div class="grid2">
+          <div class="radio"><span>Preferencia de horario</span>
+            <label><input type="radio" name="horario" value="Mañana"> Mañana</label><label><input type="radio" name="horario" value="Tarde"> Tarde</label><label><input type="radio" name="horario" value="Fin de semana"> Fin de semana</label></div>
+          <label>Fecha sugerida para visita<input name="fecha" type="date"></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="panel">
+        <legend>5. Observaciones</legend>
+        <label class="sr">Observaciones</label>
+        <textarea name="obs" rows="4" placeholder="Añade cualquier información adicional que consideres relevante…"></textarea>
+      </fieldset>
+
+      <fieldset class="panel">
+        <legend>6. Autorización</legend>
+        <label class="check"><input type="checkbox" name="rgpd" required> Confirmo que los datos proporcionados son verídicos y autorizo a PROPIA a contactar conmigo para la gestión de la compra directa del inmueble, conforme a la <a href="#">política de privacidad</a>. <b>*</b></label>
+      </fieldset>
+
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="form-submit">
+        <button class="btn btn--grad btn--lg" type="submit" id="submitBtn">Enviar solicitud <svg><use href="#i-send"/></svg></button>
+        <small>Los campos marcados con * son obligatorios · Respuesta en menos de 24 h</small>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ NOSOTROS ============ -->
-<section class="section" id="nosotros">
-  <div class="container split">
-    <div class="about__img" role="img" aria-label="Equipo de Propia Real Estate"></div>
-    <div>
-      <p class="eyebrow">Quiénes somos</p>
-      <h2>Una inmobiliaria cercana, con método</h2>
-      <p>En Propia Real Estate creemos que comprar o vender una casa es una de las decisiones más importantes de la vida. Por eso trabajamos con un único agente de referencia por cliente, comunicación transparente y un proceso claro desde la primera visita hasta la entrega de llaves.</p>
-      <blockquote class="quote">
-        “Vendieron nuestro piso en cinco semanas y nos ayudaron a encontrar el siguiente. Un trato excelente.”
-        <cite>— Laura y Miguel, clientes</cite>
-      </blockquote>
-    </div>
-  </div>
-</section>
-
-<!-- ============ CONTACTO ============ -->
-<section class="section section--alt" id="contacto">
-  <div class="container split">
-    <div>
-      <p class="eyebrow">Hablemos</p>
-      <h2>Contacto</h2>
-      <ul class="contact-list" id="contactList"><!-- desde CONFIG --></ul>
-    </div>
-    <form class="card" id="contactForm">
-      <label>Nombre<input name="name" required></label>
-      <div class="row">
-        <label>Email<input name="email" type="email" required></label>
-        <label>Teléfono<input name="phone" type="tel"></label>
-      </div>
-      <label>Me interesa
-        <select name="topic">
-          <option>Comprar</option><option>Vender</option><option>Alquilar</option><option>Otro</option>
-        </select>
-      </label>
-      <label>Mensaje<textarea name="msg" rows="4" required></textarea></label>
-      <label class="check"><input type="checkbox" required> Acepto la <a href="#">política de privacidad</a></label>
-      <button class="btn btn--block" type="submit">Enviar mensaje</button>
-      <p class="form-msg" id="contactMsg" aria-live="polite"></p>
     </form>
+
+    <div class="success" id="success" hidden>
+      <span class="ico ico--solid ico--xl"><svg><use href="#i-check"/></svg></span>
+      <h3>¡Solicitud recibida!</h3>
+      <p>Gracias. Un miembro del equipo de PROPIA te contactará en menos de 24 horas para coordinar la visita técnica.</p>
+      <button class="btn btn--line" id="newRequest">Enviar otra solicitud</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container container--narrow">
+    <header class="head">
+      <h2>Preguntas <span class="grad">frecuentes</span></h2>
+    </header>
+    <div class="faq">
+      <details><summary>¿Cuánto cuesta solicitar una oferta?</summary><p>Nada. La visita técnica, el estudio legal y la oferta son totalmente gratuitos y sin compromiso. Si no te convence, no pagas nada.</p></details>
+      <details><summary>¿Cómo calculáis el precio que ofrecéis?</summary><p>Partimos del valor de mercado real de la zona y lo ajustamos con el informe técnico (estado, reformas necesarias) y el estudio legal. En la oferta te explicamos las condiciones con total transparencia.</p></details>
+      <details><summary>¿De verdad no hay comisiones ni gastos?</summary><p>Así es. Al comprar directamente no hay intermediarios ni comisiones de agencia, y no cobramos gastos de gestión.</p></details>
+      <details><summary>¿Qué pasa si tengo hipoteca pendiente?</summary><p>No es un problema. Con el precio de la venta se cancela la hipoteca en el mismo acto de firma ante notario y tú recibes la diferencia.</p></details>
+      <details><summary>¿Cuándo cobro?</summary><p>El día de la firma de la escritura ante notario, al contado, en un plazo inferior a 15 días desde que aceptas la oferta.</p></details>
+      <details><summary>¿Tengo que reformar o vaciar el piso?</summary><p>No. Compramos el inmueble tal y como está. Solo te pedimos que nos indiques qué se queda y qué te llevas.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta" id="contacto">
+  <div class="container cta__in">
+    <h2>Vender tu inmueble rápido es posible con PROPIA</h2>
+    <p>Si buscas vender tu casa al contado, sin comisiones y con un proceso fiable, PROPIA es tu solución. Te acompañamos desde la primera visita hasta la firma final, con total transparencia.</p>
+    <a href="#formulario" class="btn btn--white btn--lg">Solicitar oferta de compra <svg><use href="#i-arrow"/></svg></a>
+    <ul class="cta__contact" data-contact></ul>
   </div>
 </section>
 </main>
 
 <footer class="footer">
-  <div class="container footer__inner">
+  <div class="container footer__in">
     <div>
-      <a href="#top" class="logo logo--light"><span class="logo__mark">P</span><span class="logo__text">Propia<small>Real Estate</small></span></a>
-      <p class="footer__legal" id="footerLegal"></p>
+      <a class="logo logo--white" href="#top"><img src="img/logo.svg" alt="" width="28" height="28"><span>Propia</span></a>
+      <p>Expertos en compra directa de inmuebles.<br>Tu solución para vender rápido y seguro.</p>
     </div>
-    <nav>
-      <a href="#">Aviso legal</a><a href="#">Privacidad</a><a href="#">Cookies</a>
-    </nav>
+    <div><h4>Navegación</h4><a href="#beneficios">Beneficios</a><a href="#proceso">Proceso</a><a href="#faq">Preguntas</a><a href="#contacto">Contacto</a></div>
+    <div><h4>Legal</h4><a href="#">Aviso legal</a><a href="#">Política de privacidad</a><a href="#">Política de cookies</a></div>
+    <div><h4>Contacto</h4><ul class="footer__contact" data-contact></ul></div>
   </div>
+  <div class="container footer__bottom"><span id="copy"></span></div>
 </footer>
 
-<!-- Modal de detalle -->
-<dialog class="modal" id="propertyModal">
-  <button class="modal__close" aria-label="Cerrar">×</button>
-  <div id="modalBody"></div>
-</dialog>
+<a href="#formulario" class="mobile-cta btn btn--grad">Solicitar oferta gratuita</a>
 
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
-<script src="js/offer.js"></script>
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
