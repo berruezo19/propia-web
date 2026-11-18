@@ -3,7 +3,7 @@
    ========================================================= */
 window.PROPIA = {
   name: "PROPIA",
-  legalName: "Capital LCA, S.L.",           // razón social (la que figura en vuestras ofertas)
+  legalName: "PropiaRealEstate",            // nombre que aparece en la web, ofertas y aceptaciones
   cif: "",                                   // CIF (aparece en las ofertas si se rellena)
   email: "info@propiarealestate.es",
   phone: "",                                 // ej. "+34 600 000 000" (si se deja vacío no se muestra)
