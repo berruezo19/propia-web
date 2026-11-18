@@ -13,50 +13,82 @@
   const fecha = d => d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
   const num = k => parseFloat(f.elements[k].value) || 0;
 
-  /* ---------- Zonas de referencia (€/m² vivienda reformada) ----------
-     Valores ORIENTATIVOS: actualízalos con vuestros testigos/tasaciones. */
-  const ZONAS = [
-    ["", "— Introducir manualmente —"],
-    [5600, "BCN · Eixample"], [6400, "BCN · Sarrià-Sant Gervasi"], [5400, "BCN · Les Corts"],
-    [5100, "BCN · Gràcia"], [4800, "BCN · Sant Martí"], [4600, "BCN · Ciutat Vella"],
-    [4000, "BCN · Sants-Montjuïc"], [3800, "BCN · Horta-Guinardó"], [3700, "BCN · Sant Andreu"],
-    [3000, "BCN · Nou Barris"], [2900, "L'Hospitalet de Llobregat"], [2900, "Badalona"],
-    [3300, "Área metropolitana (media)"]
-  ];
-  ZONAS.forEach(([v, t]) => f.zona.add(new Option(v ? `${t} · ${v.toLocaleString("es-ES")} €/m²` : t, v)));
-  f.zona.addEventListener("change", () => { if (f.zona.value) f.eurm2.value = f.zona.value; update(); });
-  f.estado.addEventListener("change", () => { f.reformam2.value = f.estado.value; update(); });
+  /* ---------- Parámetros de la calculadora PROPIA (hoja "Compra directa") ----------
+     Cambia aquí cualquier valor si se actualiza el Excel. */
+  const P = {
+    rentObjetivo: 0.32,          // rentabilidad anual exigida (fórmula E2: 0,32/365 × plazo)
+    plazoConReforma: 150,        // días (A3)
+    plazoSinReforma: 105,
+    umbralPrecio: 250000,        // € precio de venta (E4, E16, E17)
+    factorBajo: 0.024,           // corrección mensual si venta < 250.000 € (E4)
+    factorAlto: 0.016,           // corrección mensual si venta ≥ 250.000 €
+    honCompraPct: 0.03, honCompraMin: 3000,   // honorarios de compra + IVA (E15)
+    honVentaPct: 0.03, honVentaMin: 10000,    // honorarios de venta: completa hasta 10.000 € (E16)
+    iva: 1.21,
+    reformaRedisM2Alto: 900, reformaRedisM2Bajo: 700,   // €/m² con redistribución (E17)
+    reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
+    sinReforma: 12100,
+    notaria: 1500,               // (E18)
+    itp: { MD: 0.02, CT: 0.03, VC: 0.08 }   // (E19) cualquier otra zona: 8 %
+  };
+
+  // Superficie de reforma = m² construidos por defecto
+  f.m2c.addEventListener("input", () => { if (!f.sup.dataset.touched) f.sup.value = f.m2c.value; });
+  f.sup.addEventListener("input", () => f.sup.dataset.touched = "1");
 
   /* ---------- Nº de oferta ---------- */
   const newNo = () => "OF-" + new Date().toISOString().slice(2, 10).replace(/-/g, "") + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
   let current = { no: newNo(), fecha: new Date().toISOString() };
 
   /* ---------- Cálculo ---------- */
+  /* Réplica exacta de la hoja "Compra directa" de Calculadora_1.xlsx.
+     La hoja tiene una referencia circular (precio de compra ↔ gastos) que Excel resuelve
+     iterando; aquí se resuelve de forma exacta y, si oscila entre dos centenas, se toma la menor. */
   function calc() {
-    const m2 = num("m2c"), base = num("eurm2");
-    const valorActual = m2 * base;                                // valor de mercado reformado, sin ajustes
-    const arv = valorActual * (1 + num("ajuste") / 100);          // valor de reventa estimado
-    const reforma = m2 * num("reformam2");
-    const venta = arv * num("gventa") / 100;
-    const margenObj = arv * num("margen") / 100;
-    const tenencia = num("tenencia");
-    const gc = num("gcompra") / 100;
+    const venta = num("venta"), sup = num("sup");
+    const reforma = f.reforma.value === "SI", redis = f.redis.value === "SI";
+    const zona = f.zonaItp.value, itpR = P.itp[zona] ?? 0.08;
 
-    const disponible = arv - venta - margenObj - reforma - tenencia;
-    const calculada = Math.max(0, Math.floor(disponible / (1 + gc) / 500) * 500);
+    const plazo = reforma ? P.plazoConReforma : P.plazoSinReforma;                                   // A3
+    const factor = venta < P.umbralPrecio ? plazo / 30 * P.factorBajo : plazo / 30 * P.factorAlto;    // E4
+    const ventaCorr = venta * (1 - factor);                                                           // E5
+    const k = P.rentObjetivo / 365 * plazo;
+
+    const honCompra = B3 => (B3 * P.honCompraPct > P.honCompraMin ? B3 * P.honCompraPct : P.honCompraMin) * P.iva;   // E15
+    const honVenta = venta * P.honVentaPct * P.iva > P.honVentaMin ? 0 : P.honVentaMin - venta * P.honVentaPct * P.iva; // E16
+    const costeReforma = reforma                                                                                      // E17
+      ? (redis ? (venta > P.umbralPrecio ? P.reformaRedisM2Alto : P.reformaRedisM2Bajo) * sup
+               : (venta < P.umbralPrecio ? P.reformaSinRedisBajo : P.reformaSinRedisAlto))
+      : P.sinReforma;
+
+    // E2 = E5 − k·(Gastos + B3) − Gastos, con Gastos = G0(B3) + ITP·E2  →  despeje lineal en E2
+    const bruto = B3 => { const G0 = honCompra(B3) + honVenta + costeReforma + P.notaria; return (ventaCorr - k * (G0 + B3) - G0) / (1 + itpR * (1 + k)); };
+    let B3 = Math.floor(ventaCorr / 100) * 100;
+    const vistos = [];
+    for (let i = 0; i < 100; i++) {
+      const nB3 = Math.floor(bruto(B3) / 100) * 100;                                                   // E3 = REDONDEAR.MENOS(E2;-2)
+      if (nB3 === B3) break;
+      if (vistos.includes(nB3)) { B3 = Math.min(nB3, B3); break; }
+      vistos.push(B3); B3 = nB3;
+    }
+    const precioBruto = bruto(B3);
+    const calculada = Math.max(0, B3);
     const final = num("precioFinal") || calculada;
+    const baseItp = num("precioFinal") ? final : precioBruto;    // con precio manual, ITP sobre el precio real
 
-    const inversion = final * (1 + gc) + reforma + tenencia;
-    const beneficio = arv - venta - inversion;
+    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: P.notaria, itp: itpR * baseItp };
+    g.total = g.honCompra + g.honVenta + g.reforma + g.notaria + g.itp;                                  // E20
+    const coste = g.total + final;                                                                       // B11
+    const beneficio = ventaCorr - coste;                                                                 // C11
+    const margen = coste ? beneficio / coste : 0;                                                        // D11
     const solicitado = num("precio");
     return {
-      m2, arv, reforma, venta, tenencia, gastosCompra: final * gc, margenObj, calculada, final, beneficio,
-      margenReal: arv ? beneficio / arv * 100 : 0,
-      roi: inversion ? beneficio / inversion * 100 : 0,
-      sobreValor: arv ? final / arv * 100 : 0,
+      venta, plazo, factor, ventaCorr, precioBruto, calculada, final, g, coste, beneficio, zona, itpR,
+      margen: margen * 100,
+      rent: margen / plazo * 365 * 100,                                                                  // E11
       vsSolicitado: solicitado ? (final - solicitado) / solicitado * 100 : null,
       neto: final - num("cargas"),
-      ok: m2 > 0 && num("eurm2") > 0
+      ok: venta > 0 && (!reforma || !redis || sup > 0)
     };
   }
 
@@ -64,30 +96,42 @@
     const c = calc(), v = Object.fromEntries(new FormData(f));
     const on = k => f.elements[k].checked;
 
-    // Aviso de ajuste por planta sin ascensor
-    const planta = parseInt(v.planta) || 0;
-    $("#autoAdjust").textContent = v.ascensor === "No" && planta >= 2
-      ? `ℹ️ ${planta}ª planta sin ascensor: se suele aplicar un ajuste de −10 % a −20 % sobre el valor.` : "";
-
-    // Desglose interno
+    // Desglose interno (mismo orden que la hoja Excel)
+    const p1 = n => n.toFixed(1).replace(".", ",") + " %";
+    const manual = !!num("precioFinal");
     $("#calc").innerHTML = c.ok ? `
-      <table>
-        <tr><td>Valor de reventa estimado (${c.m2} m² × ${eur(num("eurm2"))}${num("ajuste") ? ` ${pct(num("ajuste"))}` : ""})</td><td>${eur(c.arv)}</td></tr>
-        <tr><td>− Gastos de reventa (${num("gventa")} %)</td><td>${eur(c.venta)}</td></tr>
-        <tr><td>− Margen objetivo (${num("margen")} %)</td><td>${eur(c.margenObj)}</td></tr>
-        <tr><td>− Reforma (${eur(num("reformam2"))}/m²)</td><td>${eur(c.reforma)}</td></tr>
-        <tr><td>− Tenencia</td><td>${eur(c.tenencia)}</td></tr>
-        <tr><td>÷ Gastos de compra (${num("gcompra")} %)</td><td></td></tr>
-        <tr class="tot"><td>Oferta máxima calculada</td><td>${eur(c.calculada)}</td></tr>
-      </table>` : `<p class="calc__empty">Introduce los m² construidos y el valor €/m² para calcular la oferta.</p>`;
+      <div class="calc__group"><h5>General</h5><table>
+        <tr><td>Plazo de operación</td><td>${c.plazo} días</td></tr>
+        <tr><td>Precio de venta</td><td>${eur(c.venta)}</td></tr>
+        <tr><td>Factor de corrección</td><td>${p1(c.factor * 100)}</td></tr>
+        <tr><td>Precio de venta corregido</td><td>${eur(c.ventaCorr)}</td></tr>
+        <tr><td>Precio de compra bruto</td><td>${eur(c.precioBruto)}</td></tr>
+        <tr class="tot"><td>Precio de compra neto</td><td>${eur(c.calculada)}</td></tr>
+      </table></div>
+      <div class="calc__group"><h5>Gastos${manual ? " <small>(sobre el precio final manual)</small>" : ""}</h5><table>
+        <tr><td>Honorarios de compra</td><td>${eur(c.g.honCompra)}</td></tr>
+        <tr><td>Honorarios de venta</td><td>${eur(c.g.honVenta)}</td></tr>
+        <tr><td>Reforma</td><td>${eur(c.g.reforma)}</td></tr>
+        <tr><td>Notaría</td><td>${eur(c.g.notaria)}</td></tr>
+        <tr><td>ITP (${c.zona} · ${p1(c.itpR * 100)})</td><td>${eur(c.g.itp)}</td></tr>
+        <tr class="tot"><td>Total gastos</td><td>${eur(c.g.total)}</td></tr>
+      </table></div>
+      <div class="calc__group"><h5>Rentabilidad${manual ? ` <small>con ${eur(c.final)}</small>` : ""}</h5><table>
+        <tr><td>Coste total</td><td>${eur(c.coste)}</td></tr>
+        <tr><td>Beneficio</td><td>${eur(c.beneficio)}</td></tr>
+        <tr><td>Margen</td><td>${p1(c.margen)}</td></tr>
+        <tr class="tot"><td>Rentabilidad anualizada</td><td>${p1(c.rent)}</td></tr>
+      </table></div>`
+      : `<p class="calc__empty">Introduce el precio de venta estimado${f.reforma.value === "SI" && f.redis.value === "SI" ? " y la superficie" : ""} para calcular la oferta.</p>`;
     f.precioFinal.placeholder = c.calculada ? `Calculado: ${eur(c.calculada)}` : "Calculado automáticamente";
 
     // KPIs
-    const mCls = c.margenReal >= num("margen") - 0.01 ? "good" : c.margenReal >= num("margen") / 2 ? "mid" : "bad";
+    const obj = P.rentObjetivo * 100;
+    const rCls = c.rent >= obj - 0.5 ? "good" : c.rent >= obj / 2 ? "mid" : "bad";
     $("#kpis").innerHTML = `
       <div class="kpi kpi--main"><span>Oferta</span><strong>${eur(c.final)}</strong></div>
-      <div class="kpi ${mCls}"><span>Margen real</span><strong>${c.ok ? c.margenReal.toFixed(1).replace(".", ",") + " %" : "—"}</strong><em>${c.ok ? eur(c.beneficio) : ""}</em></div>
-      <div class="kpi"><span>% s/ valor reventa</span><strong>${c.ok ? c.sobreValor.toFixed(0) + " %" : "—"}</strong><em>ROI ${c.ok ? c.roi.toFixed(1).replace(".", ",") + " %" : "—"}</em></div>
+      <div class="kpi ${c.ok ? rCls : ""}"><span>Rentabilidad anual</span><strong>${c.ok ? p1(c.rent) : "—"}</strong><em>objetivo ${obj} %</em></div>
+      <div class="kpi"><span>Beneficio</span><strong>${c.ok ? eur(c.beneficio) : "—"}</strong><em>margen ${c.ok ? p1(c.margen) : "—"}</em></div>
       <div class="kpi"><span>vs. solicitado</span><strong>${c.vsSolicitado === null ? "—" : pct(c.vsSolicitado)}</strong><em>${num("precio") ? eur(num("precio")) : ""}</em></div>`;
 
     // Documento
@@ -197,13 +241,19 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
   const store = list => { try { localStorage.setItem(STORE, JSON.stringify(list)); return true; } catch { return false; } };
   const snapshot = () => {
     const d = {};
-    [...f.elements].forEach(el => { if (!el.name) return; d[el.name] = el.type === "checkbox" ? el.checked : el.value; });
+    [...f.elements].forEach(el => {
+      if (!el.name) return;
+      if (el.type === "radio") { if (el.checked) d[el.name] = el.value; return; }
+      d[el.name] = el.type === "checkbox" ? el.checked : el.value;
+    });
     return d;
   };
   const fill = d => {
     [...f.elements].forEach(el => {
       if (!el.name || !(el.name in d)) return;
-      if (el.type === "checkbox") el.checked = !!d[el.name]; else el.value = d[el.name];
+      if (el.type === "radio") el.checked = el.value === d[el.name];
+      else if (el.type === "checkbox") el.checked = !!d[el.name];
+      else el.value = d[el.name] ?? "";
     });
   };
   const refreshCount = () => $("#histCount").textContent = load().length;
@@ -217,7 +267,7 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
   });
 
   function reset() {
-    f.reset(); current = { no: newNo(), fecha: new Date().toISOString() };
+    f.reset(); delete f.sup.dataset.touched; current = { no: newNo(), fecha: new Date().toISOString() };
     f.querySelectorAll(".invalid").forEach(l => l.classList.remove("invalid"));
     $("#importMsg").hidden = true; update();
   }
@@ -261,14 +311,13 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
     const m = location.hash.match(/d=([^&]+)/); if (!m) return;
     try {
       const d = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
-      const estados = { "A estrenar / reformado": "0", "Buen estado": "120", "Necesita reforma parcial": "450", "Necesita reforma integral": "850" };
       fill({
+        sup: d.m2c, reforma: d.estado === "A estrenar / reformado" ? "NO" : "SI",
         nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, cp: d.cp,
         tipo: d.tipo, anio: d.anio, m2c: d.m2c, m2u: d.m2u, planta: d.planta, ascensor: d.ascensor, ocupacion: d.ocupacion,
         precio: d.precio, habban: [d.hab, d.banos].filter(Boolean).join(" / "),
         obs: ""
       });
-      if (estados[d.estado]) { f.estado.value = estados[d.estado]; f.reformam2.value = estados[d.estado]; }
       const info = [d.cargas && `Libre de cargas: ${d.cargas}`, d.hipoteca && `Hipoteca: ${d.hipoteca}`, d.obs && `Obs.: ${d.obs}`].filter(Boolean).join(" · ");
       $("#importMsg").innerHTML = `✓ Solicitud importada (${new Date(d.recibida || Date.now()).toLocaleDateString("es-ES")}).${info ? " " + esc(info) : ""} <b>Completa la valoración en el apartado 3.</b>`;
       $("#importMsg").hidden = false;

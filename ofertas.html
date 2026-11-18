@@ -58,32 +58,27 @@
     </fieldset>
 
     <fieldset class="panel panel--calc">
-      <legend>3. Valoración y cálculo de la oferta <small>(interno, no aparece en el documento)</small></legend>
+      <legend>3. Calculadora de compra directa <small>(interno, no aparece en el documento)</small></legend>
       <div class="grid2">
-        <label>Zona (referencia)
-          <select name="zona" id="zona"></select></label>
-        <label>Valor de mercado reformado (€/m²) <b>*</b><input name="eurm2" type="number" step="50" required></label>
-        <label>Estado del inmueble
-          <select name="estado" id="estado">
-            <option value="0">A estrenar / reformado</option>
-            <option value="120">Buen estado</option>
-            <option value="450" selected>Necesita reforma parcial</option>
-            <option value="850">Necesita reforma integral</option>
+        <label>Precio de venta estimado (€) <b>*</b><input name="venta" type="number" step="1000" min="0" required placeholder="320000"></label>
+        <label>Zona (ITP)
+          <select name="zonaItp">
+            <option value="VC">VC · ITP 8 %</option>
+            <option value="CT">CT · ITP 3 %</option>
+            <option value="MD">MD · ITP 2 %</option>
           </select></label>
-        <label>Coste de reforma (€/m²)<input name="reformam2" type="number" step="10" value="450"></label>
-        <label>Ajuste de valor (%) <span class="hint" title="Planta baja/interior, sin ascensor, vistas, terraza…">?</span><input name="ajuste" type="number" step="1" value="0"></label>
-        <label>Margen objetivo PROPIA (%)<input name="margen" type="number" step="0.5" value="15"></label>
-        <label>Gastos de compra (% ITP, notaría, registro)<input name="gcompra" type="number" step="0.5" value="11"></label>
-        <label>Gastos de reventa (% comercialización, plusvalía)<input name="gventa" type="number" step="0.5" value="4"></label>
-        <label>Coste de tenencia (€) <span class="hint" title="IBI, comunidad, suministros y financiación durante la operación">?</span><input name="tenencia" type="number" step="100" value="3000"></label>
-        <label>Hipoteca / cargas a cancelar (€)<input name="cargas" type="number" step="100" value="0"></label>
+        <div class="radio"><span>Reforma</span>
+          <label><input type="radio" name="reforma" value="SI" checked> Sí</label><label><input type="radio" name="reforma" value="NO"> No</label></div>
+        <div class="radio"><span>Redistribución</span>
+          <label><input type="radio" name="redis" value="SI"> Sí</label><label><input type="radio" name="redis" value="NO" checked> No</label></div>
+        <label>Superficie (m²) <small>para reforma con redistribución</small><input name="sup" type="number" min="0"></label>
+        <label>Hipoteca / cargas a cancelar (€) <small>solo informativo</small><input name="cargas" type="number" step="100" value="0"></label>
       </div>
-      <p class="auto-adjust" id="autoAdjust"></p>
 
       <div class="calc" id="calc"></div>
 
-      <label class="final">Precio final ofertado (€) <small>déjalo vacío para usar el calculado</small>
-        <input name="precioFinal" type="number" step="500" placeholder="Calculado automáticamente"></label>
+      <label class="final">Precio final ofertado (€) <small>déjalo vacío para usar el precio de compra neto calculado</small>
+        <input name="precioFinal" type="number" step="100" placeholder="Calculado automáticamente"></label>
     </fieldset>
 
     <fieldset class="panel">
