@@ -262,9 +262,25 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
   $("#btnSave").addEventListener("click", () => {
     if (!valid()) return;
     const list = load().filter(o => o.no !== current.no);
-    list.unshift({ ...current, guardada: new Date().toISOString(), oferta: calc().final, data: snapshot() });
-    msg(store(list) ? "Oferta guardada." : "No se pudo guardar en este navegador.");
+    const c = calc();
+    list.unshift({ ...current, guardada: new Date().toISOString(), oferta: c.final, data: snapshot() });
+    const saved = store(list);
     refreshCount();
+
+    if (!C.makeWebhookOfertas) { msg(saved ? "Oferta guardada." : "No se pudo guardar en este navegador."); return; }
+    const r1 = n => Math.round(n * 10) / 10;
+    window.sendToMake(C.makeWebhookOfertas, {
+      numero: current.no, fecha: new Date().toISOString().slice(0, 10),
+      propietario: f.nombre.value, dni: f.dni.value, telefono: f.telefono.value, email: f.email.value,
+      direccion: f.direccion.value, cp: f.cp.value, m2: f.m2c.value,
+      precio_solicitado: num("precio"), precio_venta_estimado: c.venta,
+      oferta: c.final, oferta_calculada: c.calculada, precio_manual: num("precioFinal") ? "Sí" : "No",
+      gastos_total: Math.round(c.g.total), coste_total: Math.round(c.coste), beneficio: Math.round(c.beneficio),
+      margen_pct: r1(c.margen), rentabilidad_pct: r1(c.rent),
+      zona: P.zonas[c.zona] || c.zona, reforma: f.reforma.value === "SI" ? "Sí" : "No", redistribucion: f.redis.value === "SI" ? "Sí" : "No",
+      validez_dias: num("validez"), plazo_notaria_dias: num("plazo"), firmante: f.firmante.value
+    }).then(() => msg(`Oferta guardada y enviada a Make${saved ? "" : " (no se pudo guardar en este navegador)"}.`))
+      .catch(() => msg("Oferta guardada, pero no se pudo enviar a Make. Revisa la conexión."));
   });
 
   function reset() {

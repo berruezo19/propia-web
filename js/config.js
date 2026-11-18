@@ -10,11 +10,23 @@ window.PROPIA = {
   whatsapp: "",                              // ej. "34600000000" (sin + ni espacios)
   address: "Pg. de la Zona Franca, 83-95, Planta 3, Sants-Montjuïc, 08038 Barcelona",
 
-  // Envío del formulario de solicitud:
-  // - Vacío  → se abre el correo del visitante con la solicitud ya redactada.
-  // - URL de Formspree (https://formspree.io/f/XXXX) u otro servicio → se envía directamente.
+  // ===== Integración con Make (y desde Make → Slack, Sheets, CRM…) =====
+  // Pega aquí la URL del "Custom webhook" de cada escenario de Make (https://hook.eu2.make.com/...)
+  makeWebhookSolicitudes: "",   // se dispara cuando un propietario envía el formulario de la web
+  makeWebhookOfertas: "",       // se dispara al pulsar "Guardar oferta" en el generador
+
+  // Alternativa sin Make: URL de Formspree u otro servicio. Si todo está vacío,
+  // se abre el correo del visitante con la solicitud ya redactada.
   formEndpoint: "",
 
   // URL pública de la web (para el enlace "Abrir en el generador" que llega con cada solicitud)
   siteUrl: "https://propiarealestate.es"
 };
+
+/* Envío a un webhook de Make. Se manda como formulario (x-www-form-urlencoded), que Make
+   interpreta automáticamente, y en modo no-cors para que el navegador no lo bloquee. */
+window.sendToMake = (url, data) => fetch(url, {
+  method: "POST",
+  mode: "no-cors",
+  body: new URLSearchParams(Object.entries(data).map(([k, v]) => [k, v == null ? "" : String(v)]))
+});

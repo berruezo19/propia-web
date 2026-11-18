@@ -80,10 +80,13 @@
 
     btn.disabled = true; btn.classList.add("is-loading");
     try {
-      if (C.formEndpoint) {
+      const payload = { ...data, _subject: `Nueva solicitud de oferta – ${data.direccion}`, resumen: text, generador: genLink, origen: location.href };
+      if (C.makeWebhookSolicitudes) {
+        await window.sendToMake(C.makeWebhookSolicitudes, payload);
+      } else if (C.formEndpoint) {
         const r = await fetch(C.formEndpoint, {
           method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ ...data, _subject: `Nueva solicitud de oferta – ${data.direccion}`, resumen: text, generador: genLink })
+          body: JSON.stringify(payload)
         });
         if (!r.ok) throw new Error(r.status);
       } else {
