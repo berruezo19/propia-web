@@ -13,11 +13,11 @@ window.PROPIA = {
   // ===== Datos del titular para el AVISO LEGAL (aviso-legal.html) =====
   // Rellenar con los datos exactos de la sociedad. Mientras estén vacíos se muestran marcados en amarillo.
   legal: {
-    titular: "",          // razón social, ej. "XXXXX, S.L."
-    nif: "",              // ej. "B12345678"
+    titular: "ESPRESIVITY SL",
+    nif: "B64794241",
     domicilio: "Paseo de la Zona Franca, 83-95, 3ª planta (08038 Barcelona)",
-    registro: "",         // ej. "Registro Mercantil de Barcelona, Tomo X, Folio X, Hoja B-XXXXX, Inscripción 1ª"
-    telefono: "",         // ej. "931 234 567"
+    registro: "Registro Mercantil de Barcelona, en el Tomo 40.303, Folio 221, Hoja B-362.938",
+    telefono: "934872824",
     actualizado: "19 de noviembre de 2026"
   },
 
