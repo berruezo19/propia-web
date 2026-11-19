@@ -232,3 +232,5 @@ label.check>input{position:absolute;left:0;top:.15em;margin:0}
   .mobile-cta{display:flex;position:fixed;left:16px;right:16px;bottom:14px;z-index:30;transition:transform .25s}
   body{padding-bottom:76px}
 }
+.logo__img{display:block;height:40px;width:auto}
+.footer .logo__img{height:34px}

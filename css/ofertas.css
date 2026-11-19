@@ -179,3 +179,4 @@ input[readonly]{background:var(--soft);color:var(--muted)}
   .doc__price strong,.grad{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .doc__head{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+.tool .header .logo__img,.doc .logo__img{height:36px}
