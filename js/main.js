@@ -67,16 +67,12 @@
     if (!check(panels[1])) return;
     const d = Object.fromEntries(new FormData(form)); delete d.rgpd;
 
-    // El cliente pone el valor de su piso SIN reformar. La calculadora necesita el precio de venta ya reformado:
-    // si necesita reforma se estima sumando un 25 % (SUBIDA_REFORMA); si no, se usa el mismo valor.
-    const SUBIDA_REFORMA = 0.25;
-    const ventaReformado = d.reforma === "SI" ? Math.round(+d.valor * (1 + SUBIDA_REFORMA) / 1000) * 1000 : +d.valor;
-    const r = window.PROPIA_CALC.calcular({ venta: ventaReformado, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
+    const r = window.PROPIA_CALC.calcular({ venta: +d.valor, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
     const oferta = r.calculada;
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: ventaReformado, zona: d.zona, reforma: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, venta: d.valor, zona: d.zona, reforma: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 
@@ -84,14 +80,14 @@
       _subject: `Nuevo lead web – ${d.direccion}, ${d.poblacion}`,
       nombre: d.nombre, telefono: d.telefono, email: d.email,
       direccion: d.direccion, poblacion: d.poblacion, comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
-      valor_mercado: d.valor, valor_reformado: ventaReformado, reforma: d.reforma === "SI" ? "Sí" : "No", hipoteca: d.hipoteca || "", observaciones: d.obs || "",
+      valor_mercado: d.valor, reforma: d.reforma === "SI" ? "Sí" : "No", hipoteca: d.hipoteca || "", observaciones: d.obs || "",
       oferta_orientativa: oferta, precio_maximo: r.precioMax, margen_pct: Math.round(r.margen * 10) / 10,
       generador: genLink, recibida: new Date().toLocaleString("es-ES"), origen: location.href
     };
     lead.resumen = [
       `Nombre: ${lead.nombre}`, `Teléfono: ${lead.telefono}`, `Email: ${lead.email}`,
       `Inmueble: ${lead.direccion}, ${lead.poblacion} (${lead.comunidad})`, `Superficie: ${lead.m2} m²`,
-      `Valor actual sin reformar (cliente): ${eur(+lead.valor_mercado)}`, `Precio de venta reformado estimado: ${eur(ventaReformado)}`, `Reforma: ${lead.reforma}`, `Hipoteca: ${lead.hipoteca || "—"}`,
+      `Valor de mercado estimado: ${eur(+lead.valor_mercado)}`, `Reforma: ${lead.reforma}`, `Hipoteca: ${lead.hipoteca || "—"}`,
       `Observaciones: ${lead.observaciones || "—"}`, "",
       `Oferta orientativa mostrada al cliente (margen 25 %): ${eur(oferta)}`, `Precio máximo (margen 20 %): ${eur(r.precioMax)}`, "",
       `Abrir en el generador: ${genLink}`
