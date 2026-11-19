@@ -17,7 +17,15 @@
 <header class="header is-scrolled">
   <div class="container header__in">
     <a class="logo" href="/" aria-label="PropiaRealEstate, inicio"><img src="img/logo.svg" alt="" width="34" height="34"><span>Propia</span></a>
-    <a href="/#formulario" class="btn btn--grad btn--sm">Calcula tu oferta</a>
+    <nav class="nav" id="nav" aria-label="Principal">
+      <a href="/#beneficios">Beneficios</a>
+      <a href="/#proceso">Proceso</a>
+      <a href="/#situaciones">Para quién</a>
+      <a href="/#faq">Preguntas</a>
+      <a href="/#contacto">Contacto</a>
+      <a href="/#formulario" class="btn btn--grad btn--sm nav__cta">Calcula tu oferta</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
   </div>
 </header>
 
@@ -125,6 +133,10 @@
       '<li><a href="mailto:' + esc(C.email) + '">' + esc(C.email) + '</a></li><li><span>' + esc(C.address) + '</span></li>';
     document.getElementById("copy").textContent = "© " + new Date().getFullYear() + " " + C.legalName + ". Todos los derechos reservados.";
   })();
+</script>
+<script>
+(function(){var b=document.getElementById("burger"),n=document.getElementById("nav");
+b.addEventListener("click",function(){var o=n.classList.toggle("is-open");b.classList.toggle("is-open",o);b.setAttribute("aria-expanded",o);});})();
 </script>
 </body>
 </html>
