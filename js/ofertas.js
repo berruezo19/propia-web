@@ -87,7 +87,7 @@
     const dir = `${esc(v.direccion) || ph("Dirección del inmueble")}${v.poblacion ? `, ${esc(v.poblacion)}` : ""}${v.cp ? ` (${esc(v.cp)})` : ""}`;
     const head = titulo => `
       <header class="doc__head">
-        <div class="logo"><img src="img/logo.svg" alt="" width="30" height="30"><span>Propia</span></div>
+        <div class="logo"><img src="img/logo.svg?v=2" alt="" width="30" height="30"><span>Propia</span></div>
         <div class="doc__meta"><strong>${titulo}</strong><span>Nº ${esc(current.no)}</span><span>${lugar}, ${fecha(hoy)}</span></div>
       </header>`;
     const tablaPago = `
@@ -195,7 +195,7 @@
     const img = new Image();
     img.onload = () => { const c = document.createElement("canvas"); c.width = c.height = 192; c.getContext("2d").drawImage(img, 0, 0, 192, 192); try { res(c.toDataURL("image/png")); } catch { res(null); } };
     img.onerror = () => res(null);
-    img.src = "img/logo.svg";
+    img.src = "img/logo.svg?v=2";
   }));
   const safeName = s => String(s || "").replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
   $("#btnPrint").addEventListener("click", async () => {
@@ -220,7 +220,7 @@
       wrap.appendChild(c);
     });
     const png = await getLogoPng();
-    if (png) wrap.querySelectorAll('img[src$="logo.svg"]').forEach(i => { i.src = png; });
+    if (png) wrap.querySelectorAll('img[src$="logo.svg?v=2"]').forEach(i => { i.src = png; });
     document.body.appendChild(holder);
     try {
       await window.html2pdf().set({
