@@ -87,7 +87,7 @@
     const dir = `${esc(v.direccion) || ph("Dirección del inmueble")}${v.poblacion ? `, ${esc(v.poblacion)}` : ""}${v.cp ? ` (${esc(v.cp)})` : ""}`;
     const head = titulo => `
       <header class="doc__head">
-        <div class="logo"><img class="logo__img" src="img/logo-full.svg?v=1" alt="Propia" width="104" height="36"></div>
+        <div class="logo"><img class="logo__img" src="img/logo-full.svg?v=2" alt="Propia" width="111" height="36"></div>
         <div class="doc__meta"><strong>${titulo}</strong><span>Nº ${esc(current.no)}</span><span>${lugar}, ${fecha(hoy)}</span></div>
       </header>`;
     const tablaPago = `
@@ -193,9 +193,9 @@
   let logoPng = null;
   const getLogoPng = () => logoPng || (logoPng = new Promise(res => {
     const img = new Image();
-    img.onload = () => { const c = document.createElement("canvas"); c.width = 532; c.height = 184; c.getContext("2d").drawImage(img, 0, 0, 532, 184); try { res(c.toDataURL("image/png")); } catch { res(null); } };
+    img.onload = () => { const c = document.createElement("canvas"); c.width = 570; c.height = 184; c.getContext("2d").drawImage(img, 0, 0, 570, 184); try { res(c.toDataURL("image/png")); } catch { res(null); } };
     img.onerror = () => res(null);
-    img.src = "img/logo-full.svg?v=1";
+    img.src = "img/logo-full.svg?v=2";
   }));
   const safeName = s => String(s || "").replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
   $("#btnPrint").addEventListener("click", async () => {
@@ -220,7 +220,7 @@
       wrap.appendChild(c);
     });
     const png = await getLogoPng();
-    if (png) wrap.querySelectorAll('img[src$="logo-full.svg?v=1"]').forEach(i => { i.src = png; });
+    if (png) wrap.querySelectorAll('img[src$="logo-full.svg?v=2"]').forEach(i => { i.src = png; });
     document.body.appendChild(holder);
     try {
       await window.html2pdf().set({
