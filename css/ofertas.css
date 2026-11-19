@@ -12,8 +12,8 @@
 .tool .panel legend small{font-weight:400;color:var(--muted);font-size:.78rem}
 .tool label{font-size:.8rem}
 .tool input,.tool select,.tool textarea{padding:.6em .75em;font-size:.9rem}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem 1rem}
-.tool .grid2{gap:.9rem 1rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem 1rem;align-items:end}
+.tool .grid2{gap:.9rem 1rem;align-items:end}
 .checks{display:grid;gap:.55rem}
 .tool label.check{font-size:.85rem}
 .hint{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#eceaf0;color:var(--muted);font-size:.7rem;cursor:help;margin-left:.2rem}
