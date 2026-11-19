@@ -5,6 +5,7 @@
 .legal h1{font-size:clamp(2rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.3rem}
 .legal__date{font-size:.85rem;color:var(--muted);margin-bottom:2rem}
 .legal h2{font-size:1.15rem;margin:2.2rem 0 .7rem;color:var(--ink)}
+.legal h3{font-size:.95rem;margin:1.3rem 0 .5rem;color:var(--ink)}
 .legal p{margin-bottom:.9rem;color:var(--text);line-height:1.7}
 .legal ul{margin:0 0 1rem 1.2rem;display:grid;gap:.5rem}
 .legal li{line-height:1.65;color:var(--text)}
