@@ -188,15 +188,54 @@
   }
 
   /* ---------- Acciones ---------- */
-  $("#btnPrint").addEventListener("click", () => {
+  // Descarga directa del PDF (sin ventana de impresión) con html2pdf.js
+  // El logo SVG con degradado no lo pinta html2canvas: se convierte a PNG una vez
+  let logoPng = null;
+  const getLogoPng = () => logoPng || (logoPng = new Promise(res => {
+    const img = new Image();
+    img.onload = () => { const c = document.createElement("canvas"); c.width = c.height = 192; c.getContext("2d").drawImage(img, 0, 0, 192, 192); try { res(c.toDataURL("image/png")); } catch { res(null); } };
+    img.onerror = () => res(null);
+    img.src = "img/logo.svg";
+  }));
+  const safeName = s => String(s || "").replace(/[\\/:*?"<>|]+/g, "").replace(/\s+/g, " ").trim().slice(0, 80);
+  $("#btnPrint").addEventListener("click", async () => {
     if (!valid()) return;
     const what = $("#printWhat").value;
-    document.body.dataset.print = what;
-    const t = document.title;
-    const nombre = { both: "Oferta y aceptación", oferta: "Oferta", aceptacion: "Aceptación" }[what];
-    document.title = `${current.no} - ${nombre} - ${f.direccion.value}`;
-    window.print();
-    document.title = t;
+    const nombre = { both: "Oferta y aceptacion", oferta: "Oferta", aceptacion: "Aceptacion" }[what];
+    const filename = `${safeName(current.no)} - ${nombre} - ${safeName(f.direccion.value)}.pdf`;
+
+    if (typeof window.html2pdf !== "function") {            // sin librería: se usa la impresión del navegador
+      document.body.dataset.print = what; window.print(); return;
+    }
+    const btn = $("#btnPrint"), label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Generando PDF…";
+    const holder = document.createElement("div"); holder.className = "pdf-holder";
+    const wrap = document.createElement("div");
+    wrap.className = "pdf-export";
+    holder.appendChild(wrap);
+    (what === "both" ? ["doc", "doc2"] : what === "oferta" ? ["doc"] : ["doc2"]).forEach((id, i) => {
+      const c = $("#" + id).cloneNode(true);
+      c.removeAttribute("id"); c.hidden = false; c.classList.add("doc--pdf");
+      if (i > 0) c.classList.add("pdf-break");
+      wrap.appendChild(c);
+    });
+    const png = await getLogoPng();
+    if (png) wrap.querySelectorAll('img[src$="logo.svg"]').forEach(i => { i.src = png; });
+    document.body.appendChild(holder);
+    try {
+      await window.html2pdf().set({
+        margin: [10, 12, 10, 12], filename,
+        image: { type: "jpeg", quality: 0.97 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"], before: ".pdf-break", avoid: ["tr", "li", ".doc__price", ".doc__signs", ".doc__prop"] }
+      }).from(wrap).save();
+      msg(`PDF descargado: ${filename}`);
+    } catch {
+      msg("No se pudo generar el PDF. Inténtalo de nuevo.");
+    } finally {
+      holder.remove(); btn.disabled = false; btn.textContent = label;
+    }
   });
 
   // Pestañas de vista previa

@@ -94,6 +94,27 @@ input[readonly]{background:var(--soft);color:var(--muted)}
 .doc__rgpd{font-size:.68rem;color:var(--muted);margin-top:1.6rem}
 .doc__signs--one{grid-template-columns:1fr;max-width:50%}
 
+/* Exportación a PDF (descarga directa) */
+.pdf-holder{position:absolute;left:0;top:0;width:703px;z-index:-1;pointer-events:none}
+.pdf-export{width:703px;background:#fff}
+.doc--pdf{box-shadow:none!important;border-radius:0;padding:0!important;max-height:none!important;overflow:visible!important;font-size:9.4pt!important;line-height:1.45;display:block!important}
+.doc--pdf .doc__price strong,.doc--pdf .grad{background:none!important;color:#b23fd0!important;-webkit-text-fill-color:#b23fd0}
+.doc--pdf .doc__head{border-bottom:3px solid #c040d0;border-image:none}
+.doc--pdf .doc__head{padding-bottom:.7rem;margin-bottom:1rem}
+.doc--pdf p{margin-bottom:.4rem}
+.doc--pdf .doc__prop{padding:.6rem .9rem;margin:.6rem 0}
+.doc--pdf .doc__price{padding:.5rem;margin:.6rem 0}
+.doc--pdf .doc__price strong{font-size:1.9rem}
+.doc--pdf .doc__net td{padding:.26rem .2rem}
+.doc--pdf h4{margin:.9rem 0 .35rem}
+.doc--pdf ol{gap:.15rem}
+.doc--pdf .doc__interv{margin-top:.6rem}
+.doc--pdf .doc__signs{margin-top:1rem}
+.doc--pdf .doc__signs span{height:2.2rem}
+.doc--pdf .doc__foot{margin-top:.8rem;padding-top:.5rem}
+.doc--pdf .doc__rgpd{margin-top:.8rem}
+.doc--pdf + .doc--pdf{margin-top:0}
+
 /* Historial */
 .hist{border:0;border-radius:var(--r);padding:0;width:min(680px,calc(100% - 32px));box-shadow:var(--shadow-lg)}
 .hist::backdrop{background:rgba(20,10,30,.45)}
