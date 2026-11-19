@@ -73,10 +73,11 @@ h1,h2,h3,h4{color:var(--ink);line-height:1.12;letter-spacing:-.02em;font-weight:
 .trust li{display:flex;align-items:center;gap:.8rem;background:#fff;border-radius:14px;padding:.9rem 1.6rem .9rem 1rem;box-shadow:var(--shadow);font-size:.95rem;color:var(--ink);font-weight:500}
 
 /* Cifras */
-.numbers{background:var(--ink);color:#fff;padding:2.2rem 0}
+.numbers{background:linear-gradient(100deg,#fdeef4 0%,#f6eefc 55%,#efeafe 100%);padding:2.4rem 0;border-top:1px solid #f3e1ee;border-bottom:1px solid #ebe3f8}
 .numbers__in{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center}
-.numbers strong{display:block;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;background:linear-gradient(100deg,#ff7aa2,#c58bff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.numbers span{font-size:.9rem;color:#b9b6c4}
+.numbers__in>div{background:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.9);border-radius:var(--r);padding:1.2rem .8rem;box-shadow:0 6px 20px rgba(150,60,170,.07)}
+.numbers strong{display:block;font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.numbers span{font-size:.9rem;color:var(--muted)}
 
 /* Secciones */
 .section{padding:6rem 0}
