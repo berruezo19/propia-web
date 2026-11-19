@@ -429,7 +429,10 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
           estado: strip(d.field_320), precioCompra: toNum(d.field_325_raw ?? d.field_325)
         }; }
       }
-      if (!k) { kMsg(`No se ha encontrado la oferta nº ${numero} o la clave no es correcta.`, true); return; }
+      if (!k) {
+        if (getKey()) { setKey(""); showKey(); }   // la clave guardada puede ser antigua: se vuelve a pedir
+        kMsg(`No se ha encontrado la oferta nº ${numero} o la clave no es correcta. Revisa el nº y escribe la clave de acceso.`, true); return;
+      }
       setKey(clave); showKey();
 
       reset();
