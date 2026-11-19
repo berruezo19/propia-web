@@ -10,6 +10,17 @@ window.PROPIA = {
   whatsapp: "",                              // ej. "34600000000" (sin + ni espacios)
   address: "Pg. de la Zona Franca, 83-95, Planta 3, Sants-Montjuïc, 08038 Barcelona",
 
+  // ===== Datos del titular para el AVISO LEGAL (aviso-legal.html) =====
+  // Rellenar con los datos exactos de la sociedad. Mientras estén vacíos se muestran marcados en amarillo.
+  legal: {
+    titular: "",          // razón social, ej. "XXXXX, S.L."
+    nif: "",              // ej. "B12345678"
+    domicilio: "Paseo de la Zona Franca, 83-95, 3ª planta (08038 Barcelona)",
+    registro: "",         // ej. "Registro Mercantil de Barcelona, Tomo X, Folio X, Hoja B-XXXXX, Inscripción 1ª"
+    telefono: "",         // ej. "931 234 567"
+    actualizado: "19 de noviembre de 2026"
+  },
+
   // ===== Integración con Make (y desde Make → Slack, Sheets, CRM…) =====
   // Pega aquí la URL del "Custom webhook" de cada escenario de Make (https://hook.eu2.make.com/...)
   makeWebhookSolicitudes: "https://hook.eu1.make.com/hlpxabjctdie9wj5l986tk336sjve8hv",   // "PROPIA Web - Leads de la calculadora": email con cada lead
