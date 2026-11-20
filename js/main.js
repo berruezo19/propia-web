@@ -160,6 +160,14 @@
     $("#formulario").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  // Volver atrás desde el resultado conservando lo que ha escrito el cliente
+  const backToForm = n => { form.hidden = false; $("#result").hidden = true; goStep(n); };
+  $("#editRequest").addEventListener("click", () => backToForm(0));
+  // Los pasos ya hechos de la barra superior también sirven para volver
+  steps.forEach((li, i) => li.addEventListener("click", () => {
+    if (!li.classList.contains("is-done") || i > 1) return;
+    backToForm(i);
+  }));
   $("#newRequest").addEventListener("click", () => {
     form.reset(); fillMunis(); form.hidden = false; $("#result").hidden = true; goStep(0);
   });
