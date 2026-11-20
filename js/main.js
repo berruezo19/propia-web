@@ -114,7 +114,7 @@
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: d.reforma, precio: d.valor, precioFinal: oferta, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 

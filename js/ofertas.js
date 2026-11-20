@@ -366,7 +366,7 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
         zonaItp: ["VC", "CT", "MD", "VC3"].includes(d.zona) ? d.zona : f.zonaItp.value,
         nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion, cp: d.cp,
         tipo: d.tipo, anio: d.anio, m2c: d.m2c, m2u: d.m2u, planta: d.planta, ascensor: d.ascensor, ocupacion: d.ocupacion,
-        precio: d.precio, habban: [d.hab, d.banos].filter(Boolean).join(" / "),
+        precio: d.precio, precioFinal: d.precioFinal || "", habban: [d.hab, d.banos].filter(Boolean).join(" / "),
         obs: ""
       });
       if (d.sup || d.m2c) f.sup.dataset.touched = "1";
