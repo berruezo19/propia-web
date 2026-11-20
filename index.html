@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Quicksand:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=202611191300">
+<link rel="stylesheet" href="css/styles.css?v=202611201000">
 </head>
 <body>
 
@@ -22,6 +22,7 @@
   </defs>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><path d="M12 7.5h.01"/></symbol>
   <symbol id="i-badge" viewBox="0 0 24 24"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z"/><path d="m9 12 2 2 4-4"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
@@ -169,17 +170,18 @@
   <div class="container container--narrow">
     <header class="head">
       <h2>Calcula tu <span class="grad">oferta de compra</span></h2>
-      <p>Responde 6 preguntas y obtén al momento una oferta orientativa por tu vivienda. Gratis y sin compromiso.</p>
+      <p>Responde 6 preguntas y obtén al momento un <strong>precio orientativo</strong> por tu vivienda. Gratis y sin compromiso.</p>
     </header>
 
     <ol class="progress" id="progress" aria-hidden="true">
-      <li class="is-on">Tu vivienda</li><li>Tus datos</li><li>Tu oferta</li>
+      <li class="is-on">Tu vivienda</li><li>Tus datos</li><li>Precio orientativo</li>
     </ol>
 
     <form class="request" id="requestForm" novalidate>
       <!-- PASO 1 -->
       <fieldset class="panel" data-step="0">
         <legend>1. Tu vivienda</legend>
+        <p class="notice"><svg><use href="#i-info"/></svg><span>El precio que verás al final es <strong>orientativo</strong>: lo calculamos solo con los datos que nos indicas. La <strong>oferta definitiva</strong> te la confirmamos después de visitar el inmueble.</span></p>
         <label>Dirección del inmueble <b>*</b><input name="direccion" required placeholder="Calle, número, piso y puerta" autocomplete="street-address"></label>
         <div class="grid2">
           <label>Población <b>*</b><input name="poblacion" required placeholder="Barcelona" autocomplete="address-level2"></label>
@@ -214,20 +216,22 @@
           <label><input type="radio" name="hipoteca" value="Sí"> Sí</label><label><input type="radio" name="hipoteca" value="No"> No</label></div>
         <label>¿Algo más que debamos saber? <small>(opcional)</small><textarea name="obs" rows="3" placeholder="Herencia, inquilinos, urgencia…"></textarea></label>
         <label class="check"><input type="checkbox" name="rgpd" required> Acepto la <a href="/politica-privacidad">política de privacidad</a> y que PropiaRealEstate me contacte sobre la compra de mi vivienda. <b>*</b></label>
+        <p class="notice notice--sm"><svg><use href="#i-info"/></svg><span>Recuerda: el precio que verás es una <strong>estimación orientativa</strong>, no una oferta en firme.</span></p>
         <p class="form-error" id="formError" role="alert"></p>
         <div class="step-nav">
           <button class="btn btn--line" type="button" data-prev>Atrás</button>
-          <button class="btn btn--grad btn--lg" type="submit" id="submitBtn">Ver mi oferta <svg><use href="#i-send"/></svg></button>
+          <button class="btn btn--grad btn--lg" type="submit" id="submitBtn">Ver mi precio orientativo <svg><use href="#i-send"/></svg></button>
         </div>
       </fieldset>
     </form>
 
     <!-- PASO 3: RESULTADO -->
     <div class="result" id="result" hidden>
-      <p class="pill"><svg><use href="#i-badge"/></svg> Oferta orientativa</p>
-      <h3>Te podemos ofrecer</h3>
+      <p class="pill"><svg><use href="#i-badge"/></svg> Precio orientativo · no es una oferta definitiva</p>
+      <h3>Precio orientativo de compra</h3>
       <p class="result__price" id="resultPrice">—</p>
       <p class="result__sub">por tu vivienda en <strong id="resultAddr"></strong>, al contado y sin comisiones.</p>
+      <p class="notice notice--result"><svg><use href="#i-info"/></svg><span><strong>Importante:</strong> este importe es <strong>orientativo</strong> y se ha calculado solo con los datos que nos has indicado. El precio final puede variar tras la <strong>visita técnica</strong> y el <strong>estudio legal</strong> del inmueble, y te lo confirmaremos por escrito.</span></p>
       <ul class="result__list">
         <li><svg><use href="#i-check"/></svg>Pago al contado en notaría</li>
         <li><svg><use href="#i-check"/></svg>Firma en menos de 15 días</li>
