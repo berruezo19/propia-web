@@ -58,6 +58,34 @@
   const clearInvalid = e => { const b = box(e.target); if (b) b.classList.remove("invalid"); };
   form.addEventListener("input", clearInvalid);
   form.addEventListener("change", clearInvalid);
+  /* ---------- Municipio y barrio: precios por m² de zona (Radar inmobiliario, js/precios-zona.js) ---------- */
+  const ZP = window.PROPIA_ZONAS || {};
+  const PRIMA_REFORMADO = 0.10;   // +10 % sobre el precio medio de la zona = precio de venta del piso ya reformado
+  const zonaSel = $("#zonaSel"), muniSel = $("#muniSel"), poblInput = $("#poblInput"), barrioSel = $("#barrioSel");
+  const show = (sel, on) => { $(sel).hidden = !on; };
+  const opt = (v, t = v) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; };
+  const setManual = on => { show("#poblWrap", on); poblInput.required = on; if (!on) poblInput.value = muniSel.value; };
+  function fillBarrios() {
+    const z = ZP[muniSel.value], bs = z ? Object.keys(z.b) : [];
+    barrioSel.replaceChildren(opt("", "No lo sé"), ...bs.map(b => opt(b)));
+    show("#barrioWrap", bs.length > 0);
+  }
+  function fillMunis() {
+    const list = Object.keys(ZP).filter(m => ZP[m].c === zonaSel.value).sort((a, b) => a.localeCompare(b, "es"));
+    muniSel.replaceChildren(opt("", "Selecciona"), ...list.map(m => opt(m)), opt("__otro", "Otro municipio"));
+    show("#muniWrap", list.length > 0); muniSel.required = list.length > 0;
+    poblInput.value = ""; setManual(list.length === 0);
+    fillBarrios();
+  }
+  zonaSel.addEventListener("change", fillMunis);
+  muniSel.addEventListener("change", () => {
+    const otro = muniSel.value === "__otro";
+    setManual(otro); if (otro) { poblInput.value = ""; poblInput.focus(); }
+    fillBarrios();
+  });
+  // €/m² de la zona: barrio elegido → municipio. 0 si la zona no está en la tabla.
+  const precioZona = (pobl, barrio) => { const z = ZP[pobl]; return z ? (barrio && z.b[barrio]) || z.p || 0 : 0; };
+
   $("[data-next]", form).addEventListener("click", () => { if (check(panels[0])) goStep(1); });
   $("[data-prev]", form).addEventListener("click", () => goStep(0));
 
@@ -67,29 +95,40 @@
     if (!check(panels[1])) return;
     const d = Object.fromEntries(new FormData(form)); delete d.rgpd;
 
-    const r = window.PROPIA_CALC.calcular({ venta: +d.valor, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
-    const oferta = r.calculada;
+    // Precio de venta para la cuenta: m² × €/m² de la zona + 10 % (piso reformado). Si la zona no está en la
+    // tabla, se usa el valor que indica el cliente. Tope: nunca se muestra más de lo que el cliente dice que vale.
+    const eurM2 = precioZona(d.poblacion, d.barrio);
+    const ventaCalc = eurM2 ? Math.round(+d.m2 * eurM2 * (1 + PRIMA_REFORMADO) / 1000) * 1000 : +d.valor;
+    const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
+    const tope = +d.valor, topeAplicado = r.calculada > tope;
+    const oferta = Math.min(r.calculada, tope), precioMax = Math.min(r.precioMax, tope);
+    const calculo = (eurM2
+      ? `Precio de zona: ${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 %`
+      : "Valor indicado por el cliente (zona sin precio en el Radar)") +
+      (topeAplicado ? ` · tope aplicado (la cuenta daba ${eur(r.calculada)})` : "");
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: d.valor, zona: d.zona, reforma: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 
     const lead = {
       _subject: `Nuevo lead web – ${d.direccion}, ${d.poblacion}`,
       nombre: d.nombre, telefono: d.telefono, email: d.email,
-      direccion: d.direccion, poblacion: d.poblacion, comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
+      direccion: d.direccion, poblacion: d.poblacion, barrio: d.barrio || "", comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
       valor_mercado: d.valor, reforma: d.reforma === "SI" ? "Sí" : "No", hipoteca: d.hipoteca || "", observaciones: d.obs || "",
-      oferta_orientativa: oferta, precio_maximo: r.precioMax, margen_pct: Math.round(r.margen * 10) / 10,
+      eur_m2_zona: eurM2 || "", precio_venta_estimado: ventaCalc, calculo, tope_aplicado: topeAplicado ? "Sí" : "No",
+      oferta_orientativa: oferta, precio_maximo: precioMax, margen_pct: Math.round(r.margen * 10) / 10,
       generador: genLink, recibida: new Date().toLocaleString("es-ES"), origen: location.href
     };
     lead.resumen = [
       `Nombre: ${lead.nombre}`, `Teléfono: ${lead.telefono}`, `Email: ${lead.email}`,
-      `Inmueble: ${lead.direccion}, ${lead.poblacion} (${lead.comunidad})`, `Superficie: ${lead.m2} m²`,
+      `Inmueble: ${lead.direccion}, ${lead.poblacion}${lead.barrio ? " – " + lead.barrio : ""} (${lead.comunidad})`, `Superficie: ${lead.m2} m²`,
       `Valor de mercado estimado: ${eur(+lead.valor_mercado)}`, `Reforma: ${lead.reforma}`, `Hipoteca: ${lead.hipoteca || "—"}`,
       `Observaciones: ${lead.observaciones || "—"}`, "",
-      `Oferta orientativa mostrada al cliente (margen 25 %): ${eur(oferta)}`, `Precio máximo (margen 20 %): ${eur(r.precioMax)}`, "",
+      `Oferta orientativa mostrada al cliente (margen 25 %): ${eur(oferta)}`, `Precio máximo (margen 20 %): ${eur(precioMax)}`,
+      `Precio de venta estimado: ${eur(ventaCalc)} · ${calculo}`, "",
       `Abrir en el generador: ${genLink}`
     ].join("\n");
 
@@ -105,7 +144,7 @@
     btn.disabled = false; btn.classList.remove("is-loading");
 
     // Mostrar resultado
-    $("#resultAddr").textContent = `${d.direccion}, ${d.poblacion}`;
+    $("#resultAddr").textContent = `${d.direccion}, ${d.poblacion}${d.barrio ? " (" + d.barrio + ")" : ""}`;
     $("#resultPrice").textContent = oferta > 0 ? eur(oferta) : "A valorar en visita";
     $(".result__next").innerHTML = sent
       ? "<strong>¿Y ahora?</strong> Un asesor de PropiaRealEstate te llamará en menos de 24 h para concertar la visita técnica y confirmarte la oferta definitiva."
@@ -116,6 +155,6 @@
   });
 
   $("#newRequest").addEventListener("click", () => {
-    form.reset(); form.hidden = false; $("#result").hidden = true; goStep(0);
+    form.reset(); fillMunis(); form.hidden = false; $("#result").hidden = true; goStep(0);
   });
 })();

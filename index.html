@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Quicksand:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=202611201000">
+<link rel="stylesheet" href="css/styles.css?v=202611201110">
 </head>
 <body>
 
@@ -184,14 +184,19 @@
         <p class="notice"><svg><use href="#i-info"/></svg><span>El precio que verás al final es <strong>orientativo</strong>: lo calculamos solo con los datos que nos indicas. La <strong>oferta definitiva</strong> te la confirmamos después de visitar el inmueble.</span></p>
         <label>Dirección del inmueble <b>*</b><input name="direccion" required placeholder="Calle, número, piso y puerta" autocomplete="street-address"></label>
         <div class="grid2">
-          <label>Población <b>*</b><input name="poblacion" required placeholder="Barcelona" autocomplete="address-level2"></label>
           <label>Comunidad <b>*</b>
-            <select name="zona" required>
+            <select name="zona" id="zonaSel" required>
               <option value="">Selecciona</option>
               <option value="CT">Cataluña</option>
               <option value="MD">Comunidad de Madrid</option>
               <option value="VC">Comunidad Valenciana</option>
             </select></label>
+          <label id="muniWrap" hidden>Municipio <b>*</b>
+            <select id="muniSel"><option value="">Selecciona</option></select></label>
+          <label id="poblWrap">Población <b>*</b><input name="poblacion" id="poblInput" required placeholder="Barcelona" autocomplete="address-level2"></label>
+          <label id="barrioWrap" hidden>Barrio o distrito <small>(opcional)</small>
+            <select name="barrio" id="barrioSel"><option value="">No lo sé</option></select>
+            <small class="hint-text">Nos ayuda a calcular un precio más ajustado a tu zona.</small></label>
           <label>Superficie (m²) <b>*</b><input name="m2" type="number" min="15" max="2000" required placeholder="90" inputmode="numeric"></label>
           <label>Valor de mercado estimado (€) <b>*</b>
             <input name="valor" type="number" min="20000" step="1000" required placeholder="250000" inputmode="numeric">
@@ -288,7 +293,8 @@
 <a href="#formulario" class="mobile-cta btn btn--grad">Calcula tu oferta gratis</a>
 
 <script src="js/config.js?v=202611190933"></script>
+<script src="js/precios-zona.js?v=202611201100"></script>
 <script src="js/calculadora.js?v=202611190933"></script>
-<script src="js/main.js?v=202611191315"></script>
+<script src="js/main.js?v=202611201100"></script>
 </body>
 </html>
