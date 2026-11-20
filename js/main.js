@@ -100,7 +100,8 @@
     // tabla, se usa el valor que indica el cliente. Tope: nunca se muestra más de lo que el cliente dice que vale.
     const eurM2 = precioZona(d.poblacion, d.barrio);
     const ventaCalc = eurM2 ? Math.round(+d.m2 * eurM2 * (1 + PRIMA_REFORMADO) / 1000) * 1000 : +d.valor;
-    const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
+    // Reforma por m² (700–900 €/m² según la hoja, "con redistribución") en lugar de un importe fijo
+    const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: d.reforma === "SI", sup: +d.m2, zona: d.zona });
     // Siempre por debajo de lo que pide el cliente: oferta ≤ 85 % y precio máximo ≤ 90 % de su valor.
     const abajo100 = n => Math.floor(n / 100) * 100;
     const tope = abajo100(+d.valor * TOPE_OFERTA), topeAplicado = r.calculada > tope;
@@ -108,11 +109,12 @@
     const calculo = (eurM2
       ? `Precio de zona: ${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 %`
       : "Valor indicado por el cliente (zona sin precio en el Radar)") +
+      (r.g.reforma && d.reforma === "SI" ? ` · reforma estimada ${eur(r.g.reforma)} (${eur(r.g.reforma / (+d.m2 || 1))}/m²)` : "") +
       (topeAplicado ? ` · tope 85 % del valor del cliente (la cuenta con margen 25 % daba ${eur(r.calculada)})` : "");
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: d.reforma, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 
@@ -121,6 +123,7 @@
       nombre: d.nombre, telefono: d.telefono, email: d.email,
       direccion: d.direccion, poblacion: d.poblacion, barrio: d.barrio || "", comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
       valor_mercado: d.valor, reforma: d.reforma === "SI" ? "Sí" : "No", hipoteca: d.hipoteca || "", observaciones: d.obs || "",
+      coste_reforma: r.g.reforma,
       eur_m2_zona: eurM2 || "", precio_venta_estimado: ventaCalc, calculo, tope_aplicado: topeAplicado ? "Sí" : "No",
       oferta_orientativa: oferta, precio_maximo: precioMax, margen_pct: Math.round(r.margen * 10) / 10,
       generador: genLink, recibida: new Date().toLocaleString("es-ES"), origen: location.href

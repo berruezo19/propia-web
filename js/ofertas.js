@@ -362,7 +362,7 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
       const d = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
       const reforma = d.reforma ? (d.reforma === "SI" ? "SI" : "NO") : (d.estado === "A estrenar / reformado" ? "NO" : "SI");
       fill({
-        sup: d.sup || d.m2c, reforma, venta: d.venta || "",
+        sup: d.sup || d.m2c, reforma, venta: d.venta || "", ...(d.redis ? { redis: d.redis === "SI" ? "SI" : "NO" } : {}),
         zonaItp: ["VC", "CT", "MD", "VC3"].includes(d.zona) ? d.zona : f.zonaItp.value,
         nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion, cp: d.cp,
         tipo: d.tipo, anio: d.anio, m2c: d.m2c, m2u: d.m2u, planta: d.planta, ascensor: d.ascensor, ocupacion: d.ocupacion,
