@@ -61,6 +61,7 @@
   /* ---------- Municipio y barrio: precios por m² de zona (Radar inmobiliario, js/precios-zona.js) ---------- */
   const ZP = window.PROPIA_ZONAS || {};
   const PRIMA_REFORMADO = 0.10;   // +10 % sobre el precio medio de la zona = precio de venta del piso ya reformado
+  const TOPE_OFERTA = 0.85, TOPE_MAXIMO = 0.90;   // % del valor que indica el cliente (nunca le ofrecemos lo que pide)
   const zonaSel = $("#zonaSel"), muniSel = $("#muniSel"), poblInput = $("#poblInput"), barrioSel = $("#barrioSel");
   const show = (sel, on) => { $(sel).hidden = !on; };
   const opt = (v, t = v) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; };
@@ -100,12 +101,14 @@
     const eurM2 = precioZona(d.poblacion, d.barrio);
     const ventaCalc = eurM2 ? Math.round(+d.m2 * eurM2 * (1 + PRIMA_REFORMADO) / 1000) * 1000 : +d.valor;
     const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: false, sup: +d.m2, zona: d.zona });
-    const tope = +d.valor, topeAplicado = r.calculada > tope;
-    const oferta = Math.min(r.calculada, tope), precioMax = Math.min(r.precioMax, tope);
+    // Siempre por debajo de lo que pide el cliente: oferta ≤ 85 % y precio máximo ≤ 90 % de su valor.
+    const abajo100 = n => Math.floor(n / 100) * 100;
+    const tope = abajo100(+d.valor * TOPE_OFERTA), topeAplicado = r.calculada > tope;
+    const oferta = Math.min(r.calculada, tope), precioMax = Math.min(r.precioMax, abajo100(+d.valor * TOPE_MAXIMO));
     const calculo = (eurM2
       ? `Precio de zona: ${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 %`
       : "Valor indicado por el cliente (zona sin precio en el Radar)") +
-      (topeAplicado ? ` · tope aplicado (la cuenta daba ${eur(r.calculada)})` : "");
+      (topeAplicado ? ` · tope 85 % del valor del cliente (la cuenta con margen 25 % daba ${eur(r.calculada)})` : "");
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
