@@ -62,6 +62,7 @@
   const ZP = window.PROPIA_ZONAS || {};
   const PRIMA_REFORMADO = 0.10;   // +10 % sobre el precio medio de la zona = precio de venta del piso ya reformado
   const TOPE_OFERTA = 0.85, TOPE_MAXIMO = 0.90;   // % del valor que indica el cliente (nunca le ofrecemos lo que pide)
+  const M2_REFORMA_POR_M2 = 150;   // a partir de estos m² la reforma se calcula por m²
   const zonaSel = $("#zonaSel"), muniSel = $("#muniSel"), poblInput = $("#poblInput"), barrioSel = $("#barrioSel");
   const show = (sel, on) => { $(sel).hidden = !on; };
   const opt = (v, t = v) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; };
@@ -100,8 +101,10 @@
     // tabla, se usa el valor que indica el cliente. Tope: nunca se muestra más de lo que el cliente dice que vale.
     const eurM2 = precioZona(d.poblacion, d.barrio);
     const ventaCalc = eurM2 ? Math.round(+d.m2 * eurM2 * (1 + PRIMA_REFORMADO) / 1000) * 1000 : +d.valor;
-    // Reforma por m² (700–900 €/m² según la hoja, "con redistribución") en lugar de un importe fijo
-    const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: d.reforma === "SI", sup: +d.m2, zona: d.zona });
+    // Reforma: importe fijo (30.000–38.000 €, el caso habitual en Knack). Solo en inmuebles de más de
+    // M2_REFORMA_POR_M2 m² (locales, pisos muy grandes) se calcula por m² (700–900 €/m², "con redistribución").
+    const porM2 = d.reforma === "SI" && +d.m2 > M2_REFORMA_POR_M2;
+    const r = window.PROPIA_CALC.calcular({ venta: ventaCalc, reforma: d.reforma === "SI", redis: porM2, sup: +d.m2, zona: d.zona });
     // Siempre por debajo de lo que pide el cliente: oferta ≤ 85 % y precio máximo ≤ 90 % de su valor.
     const abajo100 = n => Math.floor(n / 100) * 100;
     const tope = abajo100(+d.valor * TOPE_OFERTA), topeAplicado = r.calculada > tope;
@@ -109,12 +112,12 @@
     const calculo = (eurM2
       ? `Precio de zona: ${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 %`
       : "Valor indicado por el cliente (zona sin precio en el Radar)") +
-      (r.g.reforma && d.reforma === "SI" ? ` · reforma estimada ${eur(r.g.reforma)} (${eur(r.g.reforma / (+d.m2 || 1))}/m²)` : "") +
+      (r.g.reforma && d.reforma === "SI" ? ` · reforma estimada ${eur(r.g.reforma)}${porM2 ? ` (${eur(r.g.reforma / (+d.m2 || 1))}/m², más de ${M2_REFORMA_POR_M2} m²)` : " (importe fijo)"}` : "") +
       (topeAplicado ? ` · tope 85 % del valor del cliente (la cuenta con margen 25 % daba ${eur(r.calculada)})` : "");
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: d.reforma, precio: d.valor, precioFinal: oferta, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: porM2 ? "SI" : "NO", precio: d.valor, precioFinal: oferta, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 
