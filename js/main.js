@@ -62,7 +62,8 @@
   const ZP = window.PROPIA_ZONAS || {};
   const PRIMA_REFORMADO = 0.10;   // +10 % sobre el precio medio de la zona = precio de venta del piso ya reformado
   const TOPE_OFERTA = 0.85, TOPE_MAXIMO = 0.90;   // % del valor que indica el cliente (nunca le ofrecemos lo que pide)
-  const M2_REFORMA_POR_M2 = 150;   // a partir de estos m² la reforma se calcula por m²
+  const M2_REFORMA_POR_M2 = 150;
+  const PESO_CLIENTE = 0.5;   // cuánto pesa el valor que pone el cliente frente al precio de la zona (0 = nada, 1 = todo)   // a partir de estos m² la reforma se calcula por m²
   const zonaSel = $("#zonaSel"), muniSel = $("#muniSel"), poblInput = $("#poblInput"), barrioSel = $("#barrioSel");
   const show = (sel, on) => { $(sel).hidden = !on; };
   const opt = (v, t = v) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; };
@@ -99,8 +100,12 @@
 
     // Precio de venta para la cuenta: m² × €/m² de la zona + 10 % (piso reformado). Si la zona no está en la
     // tabla, se usa el valor que indica el cliente. Tope: nunca se muestra más de lo que el cliente dice que vale.
+    // Precio de venta reformado = mitad precio de la zona (Radar +10 %) y mitad valor del cliente (+10 %).
+    // El valor del cliente solo puede mover el resultado ±30 % respecto a la zona, para evitar cifras absurdas.
     const eurM2 = precioZona(d.poblacion, d.barrio);
-    const ventaCalc = eurM2 ? Math.round(+d.m2 * eurM2 * (1 + PRIMA_REFORMADO) / 1000) * 1000 : +d.valor;
+    const ventaZona = eurM2 ? +d.m2 * eurM2 * (1 + PRIMA_REFORMADO) : 0;
+    const ventaCliente = ventaZona ? Math.min(Math.max(+d.valor * (1 + PRIMA_REFORMADO), ventaZona * 0.7), ventaZona * 1.3) : 0;
+    const ventaCalc = eurM2 ? Math.round((ventaZona * (1 - PESO_CLIENTE) + ventaCliente * PESO_CLIENTE) / 1000) * 1000 : +d.valor;
     // Reforma: importe fijo (30.000–38.000 €, el caso habitual en Knack). Solo en inmuebles de más de
     // M2_REFORMA_POR_M2 m² (locales, pisos muy grandes) se calcula por m² (700–900 €/m², "con redistribución").
     const porM2 = d.reforma === "SI" && +d.m2 > M2_REFORMA_POR_M2;
@@ -110,7 +115,7 @@
     const tope = abajo100(+d.valor * TOPE_OFERTA), topeAplicado = r.calculada > tope;
     const oferta = Math.min(r.calculada, tope), precioMax = Math.min(r.precioMax, abajo100(+d.valor * TOPE_MAXIMO));
     const calculo = (eurM2
-      ? `Precio de zona: ${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 %`
+      ? `50 % zona (${d.barrio || d.poblacion} ${eur(eurM2)}/m² × ${d.m2} m² + 10 % = ${eur(ventaZona)}) + 50 % valor del cliente + 10 % (${eur(ventaCliente)})`
       : "Valor indicado por el cliente (zona sin precio en el Radar)") +
       (r.g.reforma && d.reforma === "SI" ? ` · reforma estimada ${eur(r.g.reforma)}${porM2 ? ` (${eur(r.g.reforma / (+d.m2 || 1))}/m², más de ${M2_REFORMA_POR_M2} m²)` : " (importe fijo)"}` : "") +
       (topeAplicado ? ` · tope 85 % del valor del cliente (la cuenta con margen 25 % daba ${eur(r.calculada)})` : "");
