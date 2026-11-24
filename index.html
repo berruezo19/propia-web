@@ -185,7 +185,7 @@
         <p class="notice"><svg><use href="#i-info"/></svg><span>El precio que verás al final es <strong>orientativo</strong>: lo calculamos solo con los datos que nos indicas. La <strong>oferta definitiva</strong> te la confirmamos después de visitar el inmueble.</span></p>
         <label>Dirección del inmueble <b>*</b><input name="direccion" required placeholder="Calle, número, piso y puerta" autocomplete="street-address"></label>
         <label>Código postal <small>(opcional)</small>
-          <input name="cp" id="cpInput" inputmode="numeric" maxlength="5" pattern="\d{5}" placeholder="08017" autocomplete="postal-code"></label>
+          <input name="cp" id="cpInput" inputmode="numeric" maxlength="5" pattern="\d{5}" autocomplete="postal-code"></label>
         <div class="grid2">
           <label>Comunidad <b>*</b>
             <select name="zona" id="zonaSel" required>
@@ -196,13 +196,13 @@
             </select></label>
           <label id="muniWrap" hidden>Municipio <b>*</b>
             <select id="muniSel"><option value="">Selecciona</option></select></label>
-          <label id="poblWrap">Población <b>*</b><input name="poblacion" id="poblInput" required placeholder="Barcelona" autocomplete="address-level2"></label>
+          <label id="poblWrap">Población <b>*</b><input name="poblacion" id="poblInput" required autocomplete="address-level2"></label>
           <label id="barrioWrap" hidden>Barrio o distrito <small>(opcional)</small>
             <select name="barrio" id="barrioSel"><option value="">No lo sé</option></select>
             <small class="hint-text">Nos ayuda a calcular un precio más ajustado a tu zona.</small></label>
-          <label>Superficie (m²) <b>*</b><input name="m2" type="number" min="15" max="2000" required placeholder="90" inputmode="numeric"></label>
+          <label>Superficie (m²) <b>*</b><input name="m2" type="number" min="15" max="2000" required inputmode="numeric"></label>
           <label>Precio estimado de tu vivienda (€) <b>*</b>
-            <input name="valor" type="number" min="20000" step="1000" required placeholder="250000" inputmode="numeric"></label>
+            <input name="valor" type="number" min="20000" step="1000" required inputmode="numeric"></label>
         </div>
         <div class="radio"><span>¿Necesita reforma? <b>*</b></span>
           <label><input type="radio" name="reforma" value="SI" required> Sí</label>
@@ -216,12 +216,12 @@
         <legend>2. ¿A quién enviamos la oferta?</legend>
         <div class="grid2">
           <label>Nombre y apellidos <b>*</b><input name="nombre" required autocomplete="name"></label>
-          <label>Teléfono <b>*</b><input name="telefono" type="tel" required placeholder="600 000 000" autocomplete="tel"></label>
-          <label class="span2">Email <b>*</b><input name="email" type="email" required placeholder="tu@email.com" autocomplete="email"></label>
+          <label>Teléfono <b>*</b><input name="telefono" type="tel" required autocomplete="tel"></label>
+          <label class="span2">Email <b>*</b><input name="email" type="email" required autocomplete="email"></label>
         </div>
         <div class="radio"><span>¿Tiene hipoteca pendiente?</span>
           <label><input type="radio" name="hipoteca" value="Sí"> Sí</label><label><input type="radio" name="hipoteca" value="No"> No</label></div>
-        <label>¿Algo más que debamos saber? <small>(opcional)</small><textarea name="obs" rows="3" placeholder="Herencia, inquilinos, urgencia…"></textarea></label>
+        <label>¿Algo más que debamos saber? <small>(opcional)</small><textarea name="obs" rows="3"></textarea></label>
         <label class="check"><input type="checkbox" name="rgpd" required> Acepto la <a href="/politica-privacidad">política de privacidad</a> y que PropiaRealEstate me contacte sobre la compra de mi vivienda. <b>*</b></label>
         <p class="notice notice--sm"><svg><use href="#i-info"/></svg><span>Recuerda: el precio que verás es una <strong>estimación orientativa</strong>, no una oferta en firme.</span></p>
         <p class="form-error" id="formError" role="alert"></p>
