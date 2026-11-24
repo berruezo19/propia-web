@@ -248,4 +248,3 @@ label.check>input{position:absolute;left:0;top:.15em;margin:0}
 .btn svg{width:1.1em;height:1.1em}
 .progress li.is-done{cursor:pointer}
 .progress li.is-done:hover{color:var(--purple)}
-.result__why{max-width:560px;font-size:.92rem;color:var(--text);line-height:1.6}
