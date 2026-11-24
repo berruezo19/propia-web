@@ -15,7 +15,7 @@ window.PROPIA_CP = (() => {
   add("Gavà", "08850");
   rango("Granollers", 8400, 8403);   // Vallès Oriental
   add("Canovelles", "08420");        // Vallès Oriental
-  add("Les Franqueses del Vallès", "08520", "08529");   // Vallès Oriental (Corró d'Avall, Bellavista, Corró d'Amunt, Llerona, Marata)
+  add("Les Franqueses del Vallès", "08520", "08521", "08529");   // Vallès Oriental (Corró d'Avall, Bellavista, Corró d'Amunt, Llerona, Marata)
   rango("L'Hospitalet de Llobregat", 8901, 8908);
   add("Montcada i Reixac", "08110");
   add("Ripollet", "08291");
