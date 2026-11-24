@@ -13,7 +13,7 @@ window.PROPIA_CALC = (() => {
     factorBajo: 0.024,           // corrección mensual si venta < 250.000 € (E4)
     factorAlto: 0.016,           // corrección mensual si venta ≥ 250.000 €
     honCompraPct: 0.03, honCompraMin: 3000,   // honorarios de compra + IVA (E15)
-    honVentaPct: 0.03, honVentaFijo: 10000, honVentaUmbral: 280000,  // honorarios de venta: 3 % + IVA si la venta ≥ 280.000 €; si no, 10.000 € + IVA
+    honVentaPct: 0.03, honVentaFijo: 10000, honVentaUmbral: 280000,  // honorarios de venta: 3 % + IVA si la venta ≥ 280.000 €; si no, 10.000 € (IVA incluido)
     iva: 1.21,
     reformaRedisM2Alto: 900, reformaRedisM2Bajo: 700,   // €/m² con redistribución (E17)
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
@@ -32,7 +32,7 @@ window.PROPIA_CALC = (() => {
     const ventaCorr = venta * (1 - factor);                                                           // E5
 
     const honCompra = B => (B * P.honCompraPct > P.honCompraMin ? B * P.honCompraPct : P.honCompraMin) * P.iva;   // E15
-    const honVenta = (venta >= P.honVentaUmbral ? venta * P.honVentaPct : P.honVentaFijo) * P.iva;
+    const honVenta = venta >= P.honVentaUmbral ? venta * P.honVentaPct * P.iva : P.honVentaFijo;   // los 10.000 € ya llevan IVA
     const gastosCompra = P.notaria + P.registro + P.gestoria;
     const costeReforma = reforma                                                                                      // E17
       ? (redis ? (venta > P.umbralPrecio ? P.reformaRedisM2Alto : P.reformaRedisM2Bajo) * sup
