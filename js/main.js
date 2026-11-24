@@ -73,16 +73,24 @@
     barrioSel.replaceChildren(opt("", "No lo sé"), ...bs.map(b => opt(b)));
     show("#barrioWrap", bs.length > 0);
   }
+  // Siempre se ve "Municipio": lista desplegable si la comunidad tiene municipios en el Radar;
+  // si no (p. ej. Madrid), una casilla para escribirlo. "Otro municipio" abre esa casilla debajo.
   function fillMunis() {
-    const list = Object.keys(ZP).filter(m => ZP[m].c === zonaSel.value).sort((a, b) => a.localeCompare(b, "es"));
-    muniSel.replaceChildren(opt("", "Selecciona"), ...list.map(m => opt(m)), opt("__otro", "Otro municipio"));
-    show("#muniWrap", list.length > 0); muniSel.required = list.length > 0;
-    poblInput.value = ""; setManual(list.length === 0);
+    const com = zonaSel.value;
+    const list = Object.keys(ZP).filter(m => ZP[m].c === com).sort((a, b) => a.localeCompare(b, "es"));
+    const conLista = !com || list.length > 0;
+    muniSel.replaceChildren(opt("", com ? "Selecciona" : "Elige primero la comunidad"), ...list.map(m => opt(m)), ...(com ? [opt("__otro", "Otro municipio")] : []));
+    muniSel.disabled = !com;
+    show("#muniWrap", conLista); muniSel.required = conLista;
+    $("#poblLabel").textContent = conLista ? "Escribe tu municipio" : "Municipio";
+    poblInput.value = ""; setManual(!conLista);
     fillBarrios();
   }
+  fillMunis();
   zonaSel.addEventListener("change", fillMunis);
   muniSel.addEventListener("change", () => {
     const otro = muniSel.value === "__otro";
+    $("#poblLabel").textContent = "Escribe tu municipio";
     setManual(otro); if (otro) { poblInput.value = ""; poblInput.focus(); }
     fillBarrios();
   });
