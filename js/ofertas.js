@@ -363,7 +363,7 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
       const reforma = d.reforma ? (d.reforma === "SI" ? "SI" : "NO") : (d.estado === "A estrenar / reformado" ? "NO" : "SI");
       fill({
         sup: d.sup || d.m2c, reforma, venta: d.venta || "", ...(d.redis ? { redis: d.redis === "SI" ? "SI" : "NO" } : {}),
-        zonaItp: ["VC", "CT", "MD", "VC3"].includes(d.zona) ? d.zona : f.zonaItp.value,
+        zonaItp: ["VC", "CT", "MD", "VC3", "PV"].includes(d.zona) ? d.zona : f.zonaItp.value,
         nombre: d.nombre, dni: d.dni, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion, cp: d.cp,
         tipo: d.tipo, anio: d.anio, m2c: d.m2c, m2u: d.m2u, planta: d.planta, ascensor: d.ascensor, ocupacion: d.ocupacion,
         precio: d.precio, precioFinal: d.precioFinal || "", habban: [d.hab, d.banos].filter(Boolean).join(" / "),
@@ -441,7 +441,7 @@ ${C.email}${C.phone ? " · " + C.phone : ""}`;
         direccion: k.direccion, poblacion: k.poblacion, cp: k.cp, catastro: k.catastro,
         agencia: k.agencia, franquiciado: k.franquiciado, asesor: k.asesor, estadoKnack: k.estado,
         venta: k.venta || "", reforma: k.reforma ? "SI" : "NO", redis: k.redis ? "SI" : "NO",
-        sup: k.sup || "", m2c: k.sup || "", zonaItp: ["VC", "CT", "MD"].includes(zona) ? zona : "VC"
+        sup: k.sup || "", m2c: k.sup || "", zonaItp: ["VC", "CT", "MD", "PV"].includes(zona) ? zona : "VC"
       });
       f.sup.dataset.touched = "1";
       current = { no: String(k.numero || numero), fecha: new Date().toISOString(), knackId: k.id };

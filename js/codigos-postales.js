@@ -30,6 +30,8 @@ window.PROPIA_CP = (() => {
   rango("Terrassa", 8221, 8228);
   add("Viladecans", "08840");
   rango("València", 46001, 46026);
+  rango("Bilbao", 48001, 48015);
+  rango("Barakaldo", 48900, 48903);
 
   // Barcelona: código postal → distrito (el distrito mayoritario cuando el código abarca varios)
   const BCN = {
@@ -45,11 +47,27 @@ window.PROPIA_CP = (() => {
     "08027": "Sant Andreu", "08030": "Sant Andreu",
     "08005": "Sant Martí", "08018": "Sant Martí", "08019": "Sant Martí", "08020": "Sant Martí", "08026": "Sant Martí"
   };
+  // Bilbao: código postal → distrito o barrio de vuestro Radar (el mayoritario del código)
+  const BIO = {
+    "48001": "Abando", "48008": "Abando", "48009": "Abando", "48010": "Indautxu", "48011": "Indautxu",
+    "48003": "Ibaiondo", "48006": "Ibaiondo", "48005": "Casco Viejo",
+    "48004": "Santutxu", "48007": "Uribarri", "48012": "Errekalde", "48013": "Basurto",
+    "48014": "Deusto", "48015": "Deusto"
+  };
+  // València: código postal → distrito (solo los códigos que caen claramente en un distrito)
+  const VLC = {
+    "46001": "Ciutat Vella", "46002": "Ciutat Vella", "46003": "Ciutat Vella",
+    "46004": "l'Eixample", "46005": "l'Eixample", "46006": "l'Eixample",
+    "46007": "Extramurs", "46008": "Extramurs", "46009": "la Saïdia", "46010": "el Pla del Real",
+    "46011": "Poblats Marítims", "46024": "Poblats Marítims", "46013": "Quatre Carreres", "46026": "Quatre Carreres",
+    "46015": "Campanar", "46018": "l'Olivereta", "46019": "Rascanya", "46020": "Benimaclet",
+    "46021": "Algirós", "46022": "Camins al Grau", "46025": "Benicalap"
+  };
   // Comunidad por las dos primeras cifras (para códigos que no están en la lista)
-  const PROV = { "08": "CT", "17": "CT", "25": "CT", "43": "CT", "28": "MD", "03": "VC", "12": "VC", "46": "VC" };
+  const PROV = { "08": "CT", "17": "CT", "25": "CT", "43": "CT", "28": "MD", "03": "VC", "12": "VC", "46": "VC", "48": "PV", "20": "PV", "01": "PV" };
   return cp => {
     cp = String(cp || "").trim();
     if (!/^\d{5}$/.test(cp)) return null;
-    return { comunidad: PROV[cp.slice(0, 2)] || "", municipio: M[cp] || "", barrio: M[cp] === "Barcelona" ? BCN[cp] || "" : "" };
+    return { comunidad: PROV[cp.slice(0, 2)] || "", municipio: M[cp] || "", barrio: ({ Barcelona: BCN, Bilbao: BIO, "València": VLC }[M[cp]] || {})[cp] || "" };
   };
 })();

@@ -19,8 +19,8 @@ window.PROPIA_CALC = (() => {
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
     notaria: 1500, registro: 600, gestoria: 400,   // gastos de la compra (escritura, registro y gestoría)
-    itp: { MD: 0.02, CT: 0.10, VC: 0.09, VC3: 0.03 },   // H4, sobre el precio de compra
-    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia", VC3: "Valencia (3 %)" }
+    itp: { MD: 0.02, CT: 0.10, VC: 0.09, VC3: 0.03, PV: 0.04 },   // H4, sobre el precio de compra
+    zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia", VC3: "Valencia (3 %)", PV: "País Vasco" }
   };
 
   /* venta: precio de venta reformado · reforma/redis: booleanos · sup: m² · zona: MD|CT|VC|VC3

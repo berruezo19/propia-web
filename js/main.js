@@ -31,7 +31,7 @@
   const form = $("#requestForm"), err = $("#formError"), btn = $("#submitBtn");
   const steps = $$("#progress li"), panels = $$(".panel[data-step]", form);
   const eur = n => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0, useGrouping: "always" }).format(Math.round(n || 0));
-  const ZONAS = { CT: "Cataluña", MD: "Comunidad de Madrid", VC: "Comunidad Valenciana" };
+  const ZONAS = { CT: "Cataluña", MD: "Comunidad de Madrid", VC: "Comunidad Valenciana", PV: "País Vasco" };
   const box = el => el.closest(".radio") || el.closest("label");
 
   function goStep(n) {
