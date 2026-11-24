@@ -87,22 +87,17 @@
     fillBarrios();
   });
   // Código postal → rellena comunidad, municipio y barrio (el cliente lo puede cambiar después)
-  const cpInput = $("#cpInput"), cpHint = $("#cpHint");
-  const CP_HINT = cpHint.textContent;
+  const cpInput = $("#cpInput");
   cpInput.addEventListener("input", () => {
     cpInput.value = cpInput.value.replace(/\D/g, "").slice(0, 5);
     const z = window.PROPIA_CP && window.PROPIA_CP(cpInput.value);
-    if (!z) { cpHint.textContent = CP_HINT; return; }
+    if (!z) return;
     if (z.comunidad && zonaSel.value !== z.comunidad) { zonaSel.value = z.comunidad; fillMunis(); }
     if (z.municipio && ZP[z.municipio]) {
       muniSel.value = z.municipio; setManual(false); fillBarrios();
       if (z.barrio && ZP[z.municipio].b[z.barrio]) barrioSel.value = z.barrio;
       [zonaSel, muniSel].forEach(el => box(el).classList.remove("invalid"));
-      cpHint.textContent = `✓ ${z.municipio}${z.barrio ? " · " + z.barrio : ""}. Puedes cambiarlo abajo si no es correcto.`;
-    } else if (z.comunidad) {
-      if (!$("#muniWrap").hidden) { muniSel.value = "__otro"; setManual(true); fillBarrios(); }
-      cpHint.textContent = "No tenemos ese código en la lista: elige o escribe tu municipio abajo.";
-    } else cpHint.textContent = "No reconocemos ese código postal: rellena tu zona abajo.";
+    } else if (z.comunidad && !$("#muniWrap").hidden) { muniSel.value = "__otro"; setManual(true); fillBarrios(); }
   });
 
   // €/m² de la zona: barrio elegido → municipio. 0 si la zona no está en la tabla.
@@ -196,6 +191,6 @@
     backToForm(i);
   }));
   $("#newRequest").addEventListener("click", () => {
-    form.reset(); fillMunis(); cpHint.textContent = CP_HINT; form.hidden = false; $("#result").hidden = true; goStep(0);
+    form.reset(); fillMunis(); form.hidden = false; $("#result").hidden = true; goStep(0);
   });
 })();
