@@ -56,7 +56,7 @@
         <tr><td>Honorarios de compra</td><td>${eur(c.g.honCompra)}</td></tr>
         <tr><td>Honorarios de venta</td><td>${eur(c.g.honVenta)}</td></tr>
         <tr><td>Reforma</td><td>${eur(c.g.reforma)}</td></tr>
-        <tr><td>Notaría</td><td>${eur(c.g.notaria)}</td></tr>
+        <tr><td>Notaría, registro y gestoría</td><td>${eur(c.g.notaria)}</td></tr>
         <tr><td>ITP (${P.zonas[c.zona] || c.zona} · ${p1(c.itpR * 100)})</td><td>${eur(c.g.itp)}</td></tr>
         <tr class="tot"><td>Total gastos</td><td>${eur(c.g.total)}</td></tr>
       </table></div>

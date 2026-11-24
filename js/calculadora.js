@@ -13,12 +13,12 @@ window.PROPIA_CALC = (() => {
     factorBajo: 0.024,           // corrección mensual si venta < 250.000 € (E4)
     factorAlto: 0.016,           // corrección mensual si venta ≥ 250.000 €
     honCompraPct: 0.03, honCompraMin: 3000,   // honorarios de compra + IVA (E15)
-    honVentaPct: 0.03, honVentaMin: 10000,    // honorarios de venta: completa hasta 10.000 € (E16)
+    honVentaPct: 0.03, honVentaFijo: 10000, honVentaUmbral: 280000,  // honorarios de venta: 3 % + IVA si la venta ≥ 280.000 €; si no, 10.000 € + IVA
     iva: 1.21,
     reformaRedisM2Alto: 900, reformaRedisM2Bajo: 700,   // €/m² con redistribución (E17)
     reformaSinRedisAlto: 38000, reformaSinRedisBajo: 30000,
     sinReforma: 12100,
-    notaria: 1500,               // (E18)
+    notaria: 1500, registro: 600, gestoria: 400,   // gastos de la compra (escritura, registro y gestoría)
     itp: { MD: 0.02, CT: 0.10, VC: 0.09, VC3: 0.03 },   // H4, sobre el precio de compra
     zonas: { MD: "Madrid", CT: "Cataluña", VC: "Valencia", VC3: "Valencia (3 %)" }
   };
@@ -32,7 +32,8 @@ window.PROPIA_CALC = (() => {
     const ventaCorr = venta * (1 - factor);                                                           // E5
 
     const honCompra = B => (B * P.honCompraPct > P.honCompraMin ? B * P.honCompraPct : P.honCompraMin) * P.iva;   // E15
-    const honVenta = venta * P.honVentaPct * P.iva > P.honVentaMin ? 0 : P.honVentaMin - venta * P.honVentaPct * P.iva; // E16
+    const honVenta = (venta >= P.honVentaUmbral ? venta * P.honVentaPct : P.honVentaFijo) * P.iva;
+    const gastosCompra = P.notaria + P.registro + P.gestoria;
     const costeReforma = reforma                                                                                      // E17
       ? (redis ? (venta > P.umbralPrecio ? P.reformaRedisM2Alto : P.reformaRedisM2Bajo) * sup
                : (venta < P.umbralPrecio ? P.reformaSinRedisBajo : P.reformaSinRedisAlto))
@@ -41,7 +42,7 @@ window.PROPIA_CALC = (() => {
     // Precio P tal que beneficio / coste total = m (despeje exacto, sin referencia circular)
     const hc = P.honCompraPct * P.iva, hcMin = P.honCompraMin * P.iva;
     const precioPara = m => {
-      const R = ventaCorr / (1 + m) - honVenta - costeReforma - P.notaria;
+      const R = ventaCorr / (1 + m) - honVenta - costeReforma - gastosCompra;
       const conPct = R / (1 + hc + itpR);
       const p = conPct > P.honCompraMin / P.honCompraPct ? conPct : (R - hcMin) / (1 + itpR);
       return Math.max(0, Math.floor(p / 100) * 100);                                                 // REDONDEAR.MENOS(;-2)
@@ -50,7 +51,7 @@ window.PROPIA_CALC = (() => {
     const precioMax = precioPara(P.margenMinimo);
     const final = precioManual || calculada;
 
-    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: P.notaria, itp: itpR * final };
+    const g = { honCompra: honCompra(final), honVenta, reforma: costeReforma, notaria: gastosCompra, itp: itpR * final };
     g.total = g.honCompra + g.honVenta + g.reforma + g.notaria + g.itp;                                  // E20
     const coste = g.total + final;                                                                       // B11
     const beneficio = ventaCorr - coste;                                                                 // C11
