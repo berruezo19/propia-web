@@ -14,6 +14,8 @@ window.PROPIA_CP = (() => {
   add("Esplugues de Llobregat", "08950");
   add("Gavà", "08850");
   rango("Granollers", 8400, 8403);   // Vallès Oriental
+  add("Canovelles", "08420");        // Vallès Oriental
+  add("Les Franqueses del Vallès", "08520");   // Vallès Oriental
   rango("L'Hospitalet de Llobregat", 8901, 8908);
   add("Montcada i Reixac", "08110");
   add("Ripollet", "08291");
