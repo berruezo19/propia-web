@@ -86,6 +86,25 @@
     setManual(otro); if (otro) { poblInput.value = ""; poblInput.focus(); }
     fillBarrios();
   });
+  // Código postal → rellena comunidad, municipio y barrio (el cliente lo puede cambiar después)
+  const cpInput = $("#cpInput"), cpHint = $("#cpHint");
+  const CP_HINT = cpHint.textContent;
+  cpInput.addEventListener("input", () => {
+    cpInput.value = cpInput.value.replace(/\D/g, "").slice(0, 5);
+    const z = window.PROPIA_CP && window.PROPIA_CP(cpInput.value);
+    if (!z) { cpHint.textContent = CP_HINT; return; }
+    if (z.comunidad && zonaSel.value !== z.comunidad) { zonaSel.value = z.comunidad; fillMunis(); }
+    if (z.municipio && ZP[z.municipio]) {
+      muniSel.value = z.municipio; setManual(false); fillBarrios();
+      if (z.barrio && ZP[z.municipio].b[z.barrio]) barrioSel.value = z.barrio;
+      [zonaSel, muniSel].forEach(el => box(el).classList.remove("invalid"));
+      cpHint.textContent = `✓ ${z.municipio}${z.barrio ? " · " + z.barrio : ""}. Puedes cambiarlo abajo si no es correcto.`;
+    } else if (z.comunidad) {
+      if (!$("#muniWrap").hidden) { muniSel.value = "__otro"; setManual(true); fillBarrios(); }
+      cpHint.textContent = "No tenemos ese código en la lista: elige o escribe tu municipio abajo.";
+    } else cpHint.textContent = "No reconocemos ese código postal: rellena tu zona abajo.";
+  });
+
   // €/m² de la zona: barrio elegido → municipio. 0 si la zona no está en la tabla.
   const precioZona = (pobl, barrio) => { const z = ZP[pobl]; return z ? (barrio && z.b[barrio]) || z.p || 0 : 0; };
 
@@ -122,14 +141,14 @@
 
     // Enlace que abre la solicitud en el generador interno con todo rellenado
     const gen = { nombre: d.nombre, telefono: d.telefono, email: d.email, direccion: d.direccion, poblacion: d.poblacion,
-      m2c: d.m2, sup: d.m2, venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: porM2 ? "SI" : "NO", precio: d.valor, precioFinal: oferta, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
+      m2c: d.m2, sup: d.m2, cp: d.cp || "", venta: ventaCalc, zona: d.zona, reforma: d.reforma, redis: porM2 ? "SI" : "NO", precio: d.valor, precioFinal: oferta, hipoteca: d.hipoteca, obs: d.obs, recibida: new Date().toISOString() };
     const enc = btoa(unescape(encodeURIComponent(JSON.stringify(gen))));
     const genLink = `${location.origin}/ofertas#d=${encodeURIComponent(enc)}`;
 
     const lead = {
       _subject: `Nuevo lead web – ${d.direccion}, ${d.poblacion}`,
       nombre: d.nombre, telefono: d.telefono, email: d.email,
-      direccion: d.direccion, poblacion: d.poblacion, barrio: d.barrio || "", comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
+      direccion: d.direccion, cp: d.cp || "", poblacion: d.poblacion, barrio: d.barrio || "", comunidad: ZONAS[d.zona] || d.zona, m2: d.m2,
       valor_mercado: d.valor, reforma: d.reforma === "SI" ? "Sí" : "No", hipoteca: d.hipoteca || "", observaciones: d.obs || "",
       coste_reforma: r.g.reforma,
       eur_m2_zona: eurM2 || "", precio_venta_estimado: ventaCalc, calculo, tope_aplicado: topeAplicado ? "Sí" : "No",
@@ -177,6 +196,6 @@
     backToForm(i);
   }));
   $("#newRequest").addEventListener("click", () => {
-    form.reset(); fillMunis(); form.hidden = false; $("#result").hidden = true; goStep(0);
+    form.reset(); fillMunis(); cpHint.textContent = CP_HINT; form.hidden = false; $("#result").hidden = true; goStep(0);
   });
 })();
